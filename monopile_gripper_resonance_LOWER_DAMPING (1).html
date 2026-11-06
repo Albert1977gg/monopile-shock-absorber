@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Monopile–Gripper Animated Simulator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
+<style>
+:root{
+  --bg:#f4f7fb; --panel:#fff; --ink:#142033; --muted:#5c6b80; --line:#d8e2ef;
+  --blue:#0c548e; --green:#2e7d32; --amber:#ad6900; --red:#a52727;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#0b416f,#1376b3);color:#fff;padding:22px 28px}
+header h1{margin:0 0 5px;font-size:30px} header p{margin:0;opacity:.92}
+.wrap{max-width:1540px;margin:auto;padding:18px}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:16px}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(20,50,80,.05)}
+h2,h3{color:var(--blue);margin:0 0 10px}
+label{display:block;font-weight:650;margin-top:10px}.val{float:right;color:var(--blue)}
+input[type=range]{width:100%}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:9px;padding:10px 15px;font-weight:700;cursor:pointer;background:#e8eef5;color:#17324f}
+button.primary{background:var(--blue);color:white}
+.status{border:2px solid;border-radius:13px;padding:13px;margin-bottom:12px}
+.ok{border-color:var(--green);background:#eaf6e8}.warn{border-color:var(--amber);background:#fff4da}.danger{border-color:var(--red);background:#fde9e9}
+.topgrid{display:grid;grid-template-columns:minmax(430px,.9fr) 1.1fr;gap:16px;margin-bottom:16px}
+@media(max-width:1100px){.topgrid{grid-template-columns:1fr}}
+.scene{height:430px;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(#bde0f8 0 43%,#2b86b2 43% 75%,#ae8a60 75%)}
+.scene .skyline{position:absolute;left:0;right:0;top:43%;height:3px;background:#eef7fb}
+.wave{position:absolute;left:0;right:0;top:42%;height:10px;background:radial-gradient(ellipse at 20px 3px,transparent 12px,#d9f3ff 13px,#d9f3ff 15px,transparent 16px);background-size:45px 10px;opacity:.85}
+.seabed{position:absolute;left:0;right:0;top:75%;bottom:0;background:repeating-linear-gradient(165deg,#a8835e 0 9px,#b8946c 9px 18px)}
+.pileWrap{position:absolute;left:42%;top:18%;width:34px;height:245px;transform-origin:50% 100%;z-index:4}
+.pile{position:absolute;inset:0;border-radius:10px 10px 4px 4px;background:linear-gradient(90deg,#7b858d,#e4e8eb 40%,#8b959c 75%,#667178);border:2px solid #4e5961}
+.pileHead{position:absolute;top:-5px;left:-2px;width:38px;height:12px;border-radius:6px;background:#d7dde1}
+.gripper{position:absolute;left:-26px;top:112px;width:86px;height:24px;border-radius:6px;background:#d7a916;border:2px solid #7a5c08;box-shadow:0 2px 5px #0003}
+.arm{position:absolute;left:52%;top:45%;width:130px;height:14px;background:linear-gradient(#68747e,#cbd2d7);border:2px solid #4c565e;border-radius:6px;transform-origin:0 50%;z-index:3}
+.ship{position:absolute;left:70%;top:34%;width:180px;height:115px;z-index:2;transform-origin:50% 70%}
+.hull{position:absolute;left:0;right:0;bottom:0;height:58px;background:linear-gradient(#253847,#172a38);clip-path:polygon(0 0,100% 0,90% 100%,15% 100%);border-bottom:8px solid #8f2f29}
+.deck{position:absolute;left:25px;right:20px;bottom:58px;height:10px;background:#d9ac26}
+.bridge{position:absolute;right:22px;bottom:67px;width:64px;height:40px;background:#e9edf0;border:2px solid #64717c}
+.bridge:before{content:"";position:absolute;left:7px;right:7px;top:8px;height:11px;background:repeating-linear-gradient(90deg,#2d6a87 0 10px,#dbeaf1 10px 15px)}
+.mast{position:absolute;right:48px;bottom:107px;width:4px;height:26px;background:#3d4850}
+.shipLabel{position:absolute;left:10px;bottom:20px;color:#fff;font-size:12px;font-weight:700}
+.pin{position:absolute;width:10px;height:10px;border-radius:50%;background:#333}
+.pivot{left:calc(42% + 12px);top:calc(18% + 238px);z-index:6}
+.refline{position:absolute;left:calc(42% + 16px);top:13%;height:265px;border-left:2px dashed rgba(255,255,255,.9);z-index:1}
+.thetaLabel{position:absolute;left:calc(42% + 36px);top:14%;font-size:20px;font-weight:800;color:white;text-shadow:0 1px 2px #0008}
+.sceneInfo{position:absolute;left:12px;top:12px;background:#ffffffdc;border-radius:9px;padding:8px 10px;font-size:13px;z-index:8}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.metric{border:1px solid var(--line);background:#f8fbff;border-radius:10px;padding:9px}.metric b{display:block;color:var(--blue);font-size:19px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:1050px){.charts{grid-template-columns:1fr}}
+.chartbox{height:295px}
+.small{font-size:12px;color:var(--muted)}
+#gifBtn.recording,#gifFullBtn.recording,#vidBtn.recording,#vidFullBtn.recording{background:#a52727;color:white}
+#gifBtn:disabled,#gifFullBtn:disabled,#vidBtn:disabled,#vidFullBtn:disabled{opacity:.55;cursor:not-allowed}
+
+.resBadge{display:inline-block;margin-top:8px;padding:6px 9px;border-radius:999px;font-weight:700;background:#eef3f8}
+.resBadge.hot{background:#fde9e9;color:#8b1f1f}
+</style>
+</head>
+<body>
+<header><h1>Monopile–Gripper Simulator met live animatie</h1><p>Dezelfde 1-DOF ODE stuurt de grafieken én de beweging van paal en gripper.</p></header>
+<div class="wrap">
+<div class="layout">
+<aside>
+<div class="card">
+<h2>Sliders</h2>
+<label>P-gain kP <span class="val" id="vkp"></span></label><input id="kp" type="range" min="0" max="15000" step="50" value="10000">
+<label>D-gain kD <span class="val" id="vkd"></span></label><input id="kd" type="range" min="0" max="15000" step="100" value="3700">
+<label>Golfperiode Tf <span class="val" id="vTf"></span></label><input id="Tf" type="range" min="3" max="15" step=".1" value="7">
+<label>Frequentieverhouding r = ωf/ωn <span class="val" id="vr"></span></label>
+<input id="rTarget" type="range" min="0.20" max="2.20" step="0.01" value="1.00">
+<div class="small">Schuif naar <b>r = 1.00</b> om exact op de eigenfrequentie te forceren. Deze slider past Tf automatisch aan.</div>
+<label>Extern moment Menv <span class="val" id="vM"></span></label><input id="Menv" type="range" min="10" max="500" step="10" value="100">
+<label>Massa monopile <span class="val" id="vm"></span></label><input id="m" type="range" min="1000" max="2500" step="10" value="1653">
+<label>Monopilelengte Lmp <span class="val" id="vL"></span></label><input id="L" type="range" min="70" max="120" step="1" value="97">
+<label>Gripperhoogte lgf <span class="val" id="vlgf"></span></label><input id="lgf" type="range" min="35" max="70" step="1" value="60">
+<label>Waterdiepte Lw <span class="val" id="vLw"></span></label><input id="Lw" type="range" min="20" max="60" step="1" value="41">
+<label>Trapped water <span class="val" id="vmtw"></span></label><input id="mtw" type="range" min="0" max="3500" step="50" value="100">
+<label>Added mass <span class="val" id="vma"></span></label><input id="ma" type="range" min="0" max="3500" step="50" value="50">
+<div class="buttons">
+<button id="play" class="primary" type="button">▶ Start</button>
+<button id="pause" type="button">⏸ Pauze</button>
+<button id="reset" type="button">↺ Reset</button>
+<button id="gifBtn" type="button">🎞 GIF animatie</button>
+<button id="gifFullBtn" type="button">🖥 GIF hele sheet</button>
+<button id="vidBtn" type="button">🎥 Vaste-FPS video animatie</button>
+<button id="vidFullBtn" type="button">🖥 Video hele sheet</button>
+</div>
+<label style="margin-top:12px">Opnametijd [s]
+  <input id="recordSeconds" type="number" min="1" max="300" step="1" value="10"
+         style="width:100%;margin-top:5px;padding:9px;border:1px solid #d8e2ef;border-radius:8px;font-size:16px">
+</label>
+<div class="small">Standaard 10 s. Toegestaan: 1–300 s.</div>
+<label style="margin-top:12px">Opname-FPS
+<select id="recordFps" style="width:100%;margin-top:5px;padding:9px;border:1px solid #d8e2ef;border-radius:8px;font-size:16px">
+<option value="10">10 fps</option>
+<option value="15">15 fps</option>
+<option value="20" selected>20 fps</option>
+<option value="25">25 fps</option>
+<option value="30">30 fps</option>
+<option value="60">60 fps</option>
+</select>
+</label>
+<div class="small">20 fps is de beste balans. 60 fps geeft de vloeiendste paaltrilling, maar vraagt meer rekenkracht.</div>
+<div id="gifStatus" class="small" style="margin-top:10px;font-weight:700"></div>
+<a id="gifDownload" href="#" download style="display:none;margin-top:10px;padding:10px 14px;background:#0c548e;color:white;text-decoration:none;border-radius:8px;font-weight:700;inline-size:max-content">⬇ Download GIF</a>
+<div id="vidStatus" class="small" style="margin-top:10px;font-weight:700"></div>
+<a id="vidDownload" href="#" download style="display:none;margin-top:10px;padding:10px 14px;background:#234a72;color:white;text-decoration:none;border-radius:8px;font-weight:700;inline-size:max-content">⬇ Download video</a>
+<p class="small">De schipbeweging is alleen visuele golfcontext en zit niet in de 1-DOF states.</p>
+</div>
+</aside>
+
+<main>
+<div id="status" class="status ok"></div>
+<div class="topgrid">
+<div class="card">
+<h3>Live systeem</h3>
+<canvas id="recordCanvas" width="900" height="500" style="display:none"></canvas>
+<div class="scene" id="scene">
+<div class="wave"></div><div class="seabed"></div><div class="refline"></div><div class="thetaLabel">θ</div>
+<div class="sceneInfo" id="sceneInfo"></div><div id="resBadge" class="sceneInfo resBadge" style="top:auto;bottom:12px">r = 1.00</div>
+<div class="pileWrap" id="pileWrap"><div class="pile"><div class="pileHead"></div><div class="gripper"></div></div></div>
+<div class="arm" id="arm"></div>
+<div class="ship" id="ship"><div class="hull"><span class="shipLabel">DP vessel</span></div><div class="deck"></div><div class="bridge"></div><div class="mast"></div></div>
+<div class="pin pivot"></div>
+</div>
+<div class="metrics">
+<div class="metric"><b id="wn">–</b><span>ωn rad/s</span></div>
+<div class="metric"><b id="Tn">–</b><span>Tn s</span></div>
+<div class="metric"><b id="rr">–</b><span>r=ωf/ωn</span></div>
+<div class="metric"><b id="zeta">–</b><span>ζ</span></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Live tijdrespons</h3>
+<div class="chartbox"><canvas id="cLive"></canvas></div>
+<p class="small">De verticale marker volgt het animatietijdstip.</p>
+</div>
+</div>
+
+<div class="charts">
+<div class="card"><h3>Natuurlijke periode versus kP</h3><div class="chartbox"><canvas id="cTn"></canvas></div></div>
+<div class="card"><h3>Frequentierespons / DAF</h3><div class="chartbox"><canvas id="cFR"></canvas></div></div>
+<div class="card"><h3>Gripperrespons versus kP</h3><div class="chartbox"><canvas id="cKP"></canvas></div></div>
+<div class="card"><h3>Regelkracht tijdens simulatie</h3><div class="chartbox"><canvas id="cForce"></canvas></div></div>
+</div>
+</main>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id), g=9.80665;
+let running=true, simT=0, lastTs=null, liveData=[], forceData=[], charts={}, qGlobalR=1, x1=0, x2=0;
+
+function pvals(){
+ return {kp:+$('kp').value*1000,kd:+$('kd').value*1000,Tf:+$('Tf').value,Menv:+$('Menv').value*1e6,
+ m:+$('m').value*1000,L:+$('L').value,lgf:+$('lgf').value,Lw:+$('Lw').value,mtw:+$('mtw').value*1000,ma:+$('ma').value*1000};
+}
+function model(p){
+ let lcog=p.L/2, I=(p.m*p.L*p.L+p.mtw*p.Lw*p.Lw+p.ma*p.Lw*p.Lw)/3;
+ let keff=p.kp*p.lgf*p.lgf-p.m*g*lcog, c=p.kd*p.lgf*p.lgf, wf=2*Math.PI/p.Tf;
+ if(keff<=0) return {lcog,I,keff,c,wf,wn:NaN,Tn:NaN,zeta:NaN,r:NaN,H:NaN};
+ let wn=Math.sqrt(keff/I), Tn=2*Math.PI/wn, zeta=c/(2*Math.sqrt(keff*I)), r=wf/wn;
+ let H=1/Math.sqrt((1-r*r)**2+(2*zeta*r)**2);
+ return {lcog,I,keff,c,wf,wn,Tn,zeta,r,H};
+}
+function setLabels(p){
+ $('vkp').textContent=(p.kp/1e6).toFixed(2)+' MN/m'; $('vkd').textContent=(p.kd/1e6).toFixed(2)+' MNs/m';
+ $('vTf').textContent=p.Tf.toFixed(2)+' s'; $('vr').textContent=(+$('rTarget').value).toFixed(2); $('vM').textContent=(p.Menv/1e6).toFixed(0)+' MNm'; $('vm').textContent=(p.m/1000).toFixed(0)+' t';
+ $('vL').textContent=p.L+' m'; $('vlgf').textContent=p.lgf+' m'; $('vLw').textContent=p.Lw+' m'; $('vmtw').textContent=(p.mtw/1000)+' t'; $('vma').textContent=(p.ma/1000)+' t';
+}
+function fmt(x,n=2){return Number.isFinite(x)?x.toFixed(n):'—'}
+function syncTfFromR(){
+  const p=pvals(), q=model(p);
+  const rt=+$('rTarget').value;
+  $('vr').textContent=rt.toFixed(2);
+  if(Number.isFinite(q.wn) && q.wn>0){
+    const wf=rt*q.wn;
+    let Tf=2*Math.PI/wf;
+    Tf=Math.max(3,Math.min(15,Tf));
+    $('Tf').value=Tf.toFixed(2);
+  }
+}
+
+function status(q,p){
+ const s=$('status'); $('wn').textContent=fmt(q.wn,3); $('Tn').textContent=fmt(q.Tn,2); $('rr').textContent=fmt(q.r,3); $('zeta').textContent=fmt(q.zeta,3);
+ if(q.keff<=0){s.className='status danger';s.innerHTML='<b>INSTABIEL:</b> k_eff ≤ 0. De paal heeft geen herstellende totale stijfheid.';return}
+ let d=Math.abs(q.r-1);
+ if(d<.10){s.className='status danger';s.innerHTML='<b>GEVAAR — RESONANTIEZONE:</b> T_f='+p.Tf.toFixed(1)+' s en T_n='+q.Tn.toFixed(2)+' s, r='+q.r.toFixed(3)+', DAF≈'+q.H.toFixed(2);}
+ else if(d<.25){s.className='status warn';s.innerHTML='<b>WAARSCHUWING:</b> forcing nadert eigenfrequentie. r='+q.r.toFixed(3)+', DAF≈'+q.H.toFixed(2);}
+ else{s.className='status ok';s.innerHTML='<b>BUITEN DIRECTE RESONANTIE:</b> r='+q.r.toFixed(3)+', T_n='+q.Tn.toFixed(2)+' s, DAF≈'+q.H.toFixed(2);}
+}
+
+const resonanceMarker = {
+  id:'resonanceMarker',
+  afterDraw(chart,args,opts){
+    if(chart.canvas.id!=='cFR') return;
+    const xScale=chart.scales.x;
+    const yScale=chart.scales.y;
+    const labels=chart.data.labels.map(Number);
+    let idx=0, best=1e9;
+    labels.forEach((v,i)=>{const d=Math.abs(v-1);if(d<best){best=d;idx=i}});
+    const x=xScale.getPixelForValue(idx);
+    const ctx=chart.ctx;
+    ctx.save();
+    ctx.strokeStyle='#7a3cff';
+    ctx.lineWidth=3;
+    ctx.setLineDash([7,5]);
+    ctx.beginPath();ctx.moveTo(x,yScale.top);ctx.lineTo(x,yScale.bottom);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#7a3cff';
+    ctx.font='bold 12px sans-serif';
+    ctx.fillText('r = 1 resonantie',Math.min(x+6,chart.width-110),yScale.top+16);
+    ctx.restore();
+  }
+};
+Chart.register(resonanceMarker);
+
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),cfg)}
+function cfg(labels,sets,x,y){return {type:'line',data:{labels,datasets:sets},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:true}},scales:{x:{title:{display:true,text:x}},y:{title:{display:true,text:y}}}}}}
+function steadyTheta(t,p,q){
+ if(q.keff<=0)return 0;
+ const denRe=q.keff-q.I*q.wf*q.wf, denIm=q.c*q.wf;
+ const amp=p.Menv/Math.sqrt(denRe*denRe+denIm*denIm), phi=Math.atan2(denIm,denRe);
+ return amp*Math.cos(q.wf*t-phi);
+}
+function updateStatic(){
+ const p=pvals(), q=model(p); qGlobalR=q.r; setLabels(p); status(q,p);
+ // Tn vs kp
+ let xs=[],ys=[]; for(let k=0;k<=15000;k+=100){let qq=model({...p,kp:k*1000});xs.push(k);ys.push(qq.keff>0?qq.Tn:null)}
+ mk('cTn',cfg(xs,[{label:'Tn',data:ys,pointRadius:0,borderWidth:2}],'kP [kN/m]','Tn [s]'));
+ // DAF
+ let rr=[];for(let r=.05;r<=2.5;r+=.025)rr.push(+r.toFixed(3));
+ let sets=[.02,.05,.1,.2].map(z=>({label:'ζ='+z.toFixed(2),data:rr.map(r=>1/Math.sqrt((1-r*r)**2+(2*z*r)**2)),pointRadius:0,borderWidth:2}));
+ mk('cFR',cfg(rr,sets,'r = ωf/ωn','DAF'));
+ // gripper response
+ let ks=[],a7=[],a10=[];for(let k=0;k<=10000;k+=100){ks.push(k);[7,10].forEach((T,i)=>{let pp={...p,kp:k*1000,Tf:T},qq=model(pp),v=null;if(qq.keff>0){let den=Math.sqrt((qq.keff-qq.I*qq.wf*qq.wf)**2+(qq.c*qq.wf)**2);v=pp.lgf*pp.Menv/den}(i?a10:a7).push(v)})}
+ mk('cKP',cfg(ks,[{label:'T=7 s',data:a7,pointRadius:0,borderWidth:2},{label:'T=10 s',data:a10,pointRadius:0,borderWidth:2}],'kP [kN/m]','|x_gf| [m]'));
+ resetLive();
+}
+function resetLive(){
+ simT=0;liveData=[];forceData=[];lastTs=null;x1=0;x2=0;
+ mk('cLive',cfg([], [{label:'θ(t)',data:[],pointRadius:0,borderWidth:2}],'tijd [s]','θ [deg]'));
+ mk('cForce',cfg([], [{label:'Fctrl',data:[],pointRadius:0,borderWidth:2}],'tijd [s]','Fctrl [MN]'));
+}
+
+function rk4Step(dt,p,q){
+  if(!(q.keff>0) || !Number.isFinite(q.I) || q.I<=0){ x1=0; x2=0; return; }
+  const f=(t,a,b)=>[b,(p.Menv*Math.cos(q.wf*t)-q.c*b-q.keff*a)/q.I];
+  const k1=f(simT,x1,x2);
+  const k2=f(simT+dt/2,x1+dt*k1[0]/2,x2+dt*k1[1]/2);
+  const k3=f(simT+dt/2,x1+dt*k2[0]/2,x2+dt*k2[1]/2);
+  const k4=f(simT+dt,x1+dt*k3[0],x2+dt*k3[1]);
+  x1 += dt*(k1[0]+2*k2[0]+2*k3[0]+k4[0])/6;
+  x2 += dt*(k1[1]+2*k2[1]+2*k3[1]+k4[1])/6;
+}
+
+function animate(ts){
+ if(lastTs===null)lastTs=ts;
+ let dt=Math.min(.03,Math.max(.001,(ts-lastTs)/1000)); lastTs=ts;
+ const p=pvals(),q=model(p);
+ if(running){
+   // integrate the SAME ODE that is used for the model
+   // substepping keeps the animation stable near resonance
+   const nsub=3, h=dt/nsub;
+   for(let i=0;i<nsub;i++){ rk4Step(h,p,q); simT+=h; }
+ }
+ let th=x1, thDeg=th*180/Math.PI;
+ let xgf=p.lgf*Math.sin(th);
+
+ // Visual motion is based on the real states, but scaled for readability.
+ // Near resonance the scale increases smoothly, so r -> 1 is obvious.
+ let resonanceBoost = 1;
+ if(Number.isFinite(q.r)){
+   const d=Math.abs(q.r-1);
+   resonanceBoost = 1 + 2.2*Math.exp(-Math.pow(d/0.10,2));
+ }
+ const angleScale = 2.2*resonanceBoost;
+ let vis=Math.max(-18,Math.min(18,thDeg*angleScale));
+ $('pileWrap').style.transform='rotate('+vis+'deg)';
+
+ // Gripper visibly follows the pile displacement at gripper height.
+ // Clamp only the visual pixels, not the physical xgf state.
+ const gx=Math.max(-85,Math.min(85,xgf*18*resonanceBoost));
+ const gy=Math.max(-10,Math.min(10,Math.abs(xgf)*1.5));
+ const gr=$('.gripper');
+ if(gr) gr.style.transform='translate('+gx+'px,'+(-gy)+'px)';
+
+ // Vessel remains visual context, but increases slightly near resonance.
+ let shipAmp=5+2*(resonanceBoost-1);
+ let shipY=shipAmp*Math.sin(q.wf*simT*.55);
+ let shipRoll=(1.2+0.4*(resonanceBoost-1))*Math.sin(q.wf*simT*.55+.8);
+ $('ship').style.transform='translateY('+shipY+'px) rotate('+shipRoll+'deg)';
+
+ // Arm follows the gripper displacement.
+ $('arm').style.transform='translateX('+(gx*0.65)+'px) rotate('+(shipRoll*.25)+'deg)';
+ $('sceneInfo').innerHTML='t = '+simT.toFixed(1)+' s<br>θ = '+thDeg.toFixed(3)+'°<br>x<sub>gf</sub> = '+xgf.toFixed(3)+' m';
+ const rb=$('resBadge');
+ if(Number.isFinite(q.r)){
+   rb.textContent='r = '+q.r.toFixed(3)+(Math.abs(q.r-1)<0.03?' • RESONANTIE':'');
+   rb.className='sceneInfo resBadge'+(Math.abs(q.r-1)<0.10?' hot':'');
+ }
+ if(running && q.keff>0 && liveData.length<900){
+   if(liveData.length===0 || simT-liveData[liveData.length-1].x>.10){
+     let vel=x2;
+     let xdotgf=p.lgf*Math.cos(th)*vel;
+     let F=-(p.kp*xgf+p.kd*xdotgf);
+     liveData.push({x:+simT.toFixed(2),y:thDeg});forceData.push({x:+simT.toFixed(2),y:F/1e6});
+     if(liveData.length>500){liveData.shift();forceData.shift()}
+     charts.cLive.data.labels=liveData.map(d=>d.x);charts.cLive.data.datasets[0].data=liveData.map(d=>d.y);charts.cLive.update('none');
+     charts.cForce.data.labels=forceData.map(d=>d.x);charts.cForce.data.datasets[0].data=forceData.map(d=>d.y);charts.cForce.update('none');
+   }
+ }
+ requestAnimationFrame(animate);
+}
+
+
+
+async function captureFrames(target, seconds, fps, info){
+  const frames=[];
+  const total=Math.round(seconds*fps);
+  const delay=1000/fps;
+  for(let i=0;i<total;i++){
+    const canvas=await html2canvas(target,{
+      backgroundColor:'#ffffff',
+      scale:1,
+      logging:false,
+      useCORS:true
+    });
+    frames.push(canvas.toDataURL('image/png'));
+    info.textContent='Opname… '+((i+1)/fps).toFixed(1)+' / '+seconds+' s';
+    await new Promise(r=>setTimeout(r,delay));
+  }
+  return frames;
+}
+
+
+
+
+function getRecordFps(){
+  const el=$('recordFps');
+  let fps=parseInt(el.value,10);
+  if(![10,15,20,25,30,60].includes(fps)) fps=20;
+  el.value=String(fps);
+  return fps;
+}
+
+function getRecordSeconds(){
+  const el=$('recordSeconds');
+  let s=parseInt(el.value,10);
+  if(!Number.isFinite(s)) s=10;
+  s=Math.max(1,Math.min(300,s));
+  el.value=s;
+  return s;
+}
+
+function dataURLtoBlob(dataURL){
+  const parts=dataURL.split(',');
+  const mime=(parts[0].match(/:(.*?);/)||[])[1]||'image/gif';
+  const bin=atob(parts[1]);
+  const len=bin.length;
+  const arr=new Uint8Array(len);
+  for(let i=0;i<len;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+function buildGifWithGifshot(frames, fps, filename, info, done){
+  info.textContent='GIF wordt opgebouwd…';
+  gifshot.createGIF({
+    images:frames,
+    gifWidth:frames.length?undefined:640,
+    gifHeight:frames.length?undefined:360,
+    interval:1/fps,
+    numFrames:frames.length,
+    sampleInterval:10
+  }, function(obj){
+    if(obj.error){
+      info.textContent='GIF-opname mislukt: '+obj.errorMsg;
+      done(false);
+      return;
+    }
+    const blob=dataURLtoBlob(obj.image);
+    const url=URL.createObjectURL(blob);
+    const a=$('gifDownload');
+    if(a.dataset.prevUrl) URL.revokeObjectURL(a.dataset.prevUrl);
+    a.dataset.prevUrl=url;
+    a.href=url;
+    a.download=filename;
+    a.style.display='inline-block';
+    a.textContent='⬇ Download GIF ('+filename+')';
+    info.textContent='GIF klaar. Klik hieronder op “Download GIF”.';
+    done(true);
+  });
+}
+
+async function recordGif10s(){
+  const btn=$('gifBtn'), info=$('gifStatus'), target=$('scene');
+  if(btn.disabled) return;
+  btn.disabled=true; $('gifFullBtn').disabled=true; btn.classList.add('recording'); $('gifDownload').style.display='none';
+  const wasRunning=running; running=true;
+  try{
+    const fps=4, seconds=getRecordSeconds();
+    const frames=await captureFrames(target,seconds,fps,info);
+    const rNow=model(pvals());
+    const rText=Number.isFinite(rNow.r)?rNow.r.toFixed(2):'NA';
+    buildGifWithGifshot(frames,fps,'monopile_gripper_r_'+rText+'_'+seconds+'s.gif',info,()=>{
+      btn.disabled=false; $('gifFullBtn').disabled=false; btn.classList.remove('recording'); running=wasRunning;
+    });
+  }catch(err){
+    info.textContent='GIF-opname mislukt: '+err.message;
+    btn.disabled=false; $('gifFullBtn').disabled=false; btn.classList.remove('recording'); running=wasRunning;
+  }
+}
+
+async function recordFullGif10s(){
+  const btn=$('gifFullBtn'), info=$('gifStatus');
+  const target=document.querySelector('.wrap');
+  if(btn.disabled) return;
+  btn.disabled=true; $('gifBtn').disabled=true; btn.classList.add('recording'); $('gifDownload').style.display='none';
+  const wasRunning=running; running=true;
+  try{
+    const fps=2, seconds=getRecordSeconds();
+    const frames=await captureFrames(target,seconds,fps,info);
+    const rNow=model(pvals());
+    const rText=Number.isFinite(rNow.r)?rNow.r.toFixed(2):'NA';
+    buildGifWithGifshot(frames,fps,'monopile_gripper_FULL_SHEET_r_'+rText+'_'+seconds+'s.gif',info,()=>{
+      btn.disabled=false; $('gifBtn').disabled=false; btn.classList.remove('recording'); running=wasRunning;
+    });
+  }catch(err){
+    info.textContent='GIF-opname mislukt: '+err.message;
+    btn.disabled=false; $('gifBtn').disabled=false; btn.classList.remove('recording'); running=wasRunning;
+  }
+}
+
+
+async function recordElementWebM(target, seconds, filename, btn){
+  const info=$('vidStatus'), dl=$('vidDownload');
+  if(!window.MediaRecorder){
+    info.textContent='Video-opname niet ondersteund door deze browser.';
+    return;
+  }
+  btn.disabled=true;
+  $('vidBtn').disabled=true; $('vidFullBtn').disabled=true;
+  btn.classList.add('recording');
+  dl.style.display='none';
+
+  const wasRunning=running;
+  running=true;
+
+  let canvas=document.createElement('canvas');
+  let ctx=canvas.getContext('2d');
+  let rect=target.getBoundingClientRect();
+  canvas.width=Math.max(640, Math.round(rect.width));
+  canvas.height=Math.max(360, Math.round(rect.height));
+
+  const stream=canvas.captureStream(15);
+  let mime='video/webm;codecs=vp9';
+  if(!MediaRecorder.isTypeSupported(mime)) mime='video/webm;codecs=vp8';
+  if(!MediaRecorder.isTypeSupported(mime)) mime='video/webm';
+
+  let chunks=[];
+  let rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:4500000});
+  rec.ondataavailable=e=>{if(e.data && e.data.size) chunks.push(e.data)};
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const url=URL.createObjectURL(blob);
+    if(dl.dataset.prevUrl) URL.revokeObjectURL(dl.dataset.prevUrl);
+    dl.dataset.prevUrl=url;
+    dl.href=url;
+    dl.download=filename;
+    dl.style.display='inline-block';
+    dl.textContent='⬇ Download video ('+filename+')';
+    info.textContent='Video klaar. Klik op “Download video”.';
+    btn.disabled=false; $('vidBtn').disabled=false; $('vidFullBtn').disabled=false;
+    btn.classList.remove('recording');
+    running=wasRunning;
+  };
+
+  rec.start(250);
+  const start=performance.now();
+  info.textContent='Video-opname gestart… 0 / '+seconds+' s';
+
+  async function drawLoop(now){
+    const elapsed=(now-start)/1000;
+    try{
+      const snap=await html2canvas(target,{backgroundColor:'#ffffff',scale:1,logging:false,useCORS:true});
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(snap,0,0,canvas.width,canvas.height);
+    }catch(e){}
+    info.textContent='Video-opname… '+Math.min(seconds,elapsed).toFixed(1)+' / '+seconds+' s';
+    if(elapsed<seconds){
+      requestAnimationFrame(drawLoop);
+    }else{
+      rec.stop();
+      stream.getTracks().forEach(t=>t.stop());
+    }
+  }
+  requestAnimationFrame(drawLoop);
+}
+
+
+function drawRecorderScene(ctx,w,h,p,q,t){
+  ctx.clearRect(0,0,w,h);
+
+  // sky
+  let sky=ctx.createLinearGradient(0,0,0,h*.45);
+  sky.addColorStop(0,'#bfe3fa'); sky.addColorStop(1,'#d9eefb');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,w,h*.43);
+
+  // sea
+  let sea=ctx.createLinearGradient(0,h*.43,0,h*.76);
+  sea.addColorStop(0,'#54a9cf'); sea.addColorStop(1,'#176c99');
+  ctx.fillStyle=sea; ctx.fillRect(0,h*.43,w,h*.33);
+
+  // waves
+  ctx.strokeStyle='#e8f8ff'; ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=0;x<w;x+=4){
+    const y=h*.43 + 3*Math.sin((x/24)+(t*2.2));
+    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // seabed
+  ctx.fillStyle='#ad8963'; ctx.fillRect(0,h*.76,w,h*.24);
+  ctx.strokeStyle='#8d6c4d'; ctx.lineWidth=1;
+  for(let y=h*.78;y<h;y+=14){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y-32); ctx.stroke();
+  }
+
+  // physical state
+  const th=x1;
+  const thDeg=th*180/Math.PI;
+  const xgf=p.lgf*Math.sin(th);
+
+  // resonance visual boost (same idea as HTML view)
+  let resonanceBoost=1;
+  if(Number.isFinite(q.r)){
+    const d=Math.abs(q.r-1);
+    resonanceBoost=1+2.2*Math.exp(-Math.pow(d/0.10,2));
+  }
+  const drawAngle=Math.max(-18,Math.min(18,thDeg*2.2*resonanceBoost))*Math.PI/180;
+
+  // reference line
+  const px=w*.42, py=h*.76;
+  ctx.save();
+  ctx.setLineDash([8,6]); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py-h*.57);ctx.stroke();ctx.restore();
+
+  // ship
+  const shipX=w*.70, shipBase=h*.48;
+  const shipY=(5+2*(resonanceBoost-1))*Math.sin(q.wf*t*.55);
+  const shipRoll=(1.2+0.4*(resonanceBoost-1))*Math.sin(q.wf*t*.55+.8)*Math.PI/180;
+  ctx.save();
+  ctx.translate(shipX,shipBase+shipY);
+  ctx.rotate(shipRoll);
+  ctx.fillStyle='#213746';
+  ctx.beginPath();ctx.moveTo(-5,0);ctx.lineTo(170,0);ctx.lineTo(155,55);ctx.lineTo(20,55);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#8f2f29';ctx.fillRect(22,49,132,7);
+  ctx.fillStyle='#d9ad29';ctx.fillRect(24,-9,132,9);
+  ctx.fillStyle='#edf0f2';ctx.fillRect(103,-46,54,37);
+  ctx.fillStyle='#376f88';
+  for(let i=0;i<4;i++)ctx.fillRect(109+i*11,-38,8,9);
+  ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.fillText('DP vessel',34,35);
+  ctx.restore();
+
+  // pile + gripper
+  const pileLen=h*.58, pileW=34;
+  ctx.save();
+  ctx.translate(px,py);
+  ctx.rotate(drawAngle);
+  let grad=ctx.createLinearGradient(-pileW/2,0,pileW/2,0);
+  grad.addColorStop(0,'#747f87');grad.addColorStop(.45,'#e4e8eb');grad.addColorStop(1,'#68727a');
+  ctx.fillStyle=grad;
+  ctx.fillRect(-pileW/2,-pileLen,pileW,pileLen);
+  ctx.strokeStyle='#4f5960';ctx.lineWidth=2;ctx.strokeRect(-pileW/2,-pileLen,pileW,pileLen);
+
+  // gripper location
+  const grY=-pileLen*.54;
+  const gx=Math.max(-80,Math.min(80,xgf*18*resonanceBoost));
+  ctx.fillStyle='#d6a91c';ctx.strokeStyle='#7a5d08';ctx.lineWidth=2;
+  ctx.fillRect(-42+gx,grY-11,84,22);ctx.strokeRect(-42+gx,grY-11,84,22);
+  ctx.restore();
+
+  // approximate connection arm
+  const armY=py-pileLen*.54;
+  ctx.strokeStyle='#7d8992';ctx.lineWidth=12;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(px+25,armY);ctx.lineTo(shipX+5,shipBase-5+shipY);ctx.stroke();
+
+  // overlay text
+  ctx.fillStyle='rgba(255,255,255,.90)';ctx.fillRect(14,14,220,82);
+  ctx.fillStyle='#17324f';ctx.font='bold 16px sans-serif';
+  ctx.fillText('Monopile–Gripper',26,38);
+  ctx.font='14px sans-serif';
+  ctx.fillText('t = '+t.toFixed(1)+' s',26,59);
+  ctx.fillText('θ = '+thDeg.toFixed(3)+'°',26,78);
+  ctx.fillText('r = '+(Number.isFinite(q.r)?q.r.toFixed(3):'—'),130,78);
+
+  if(Number.isFinite(q.r) && Math.abs(q.r-1)<0.10){
+    ctx.fillStyle='rgba(165,39,39,.92)';
+    ctx.fillRect(w-205,18,185,38);
+    ctx.fillStyle='white';ctx.font='bold 15px sans-serif';
+    ctx.fillText('RESONANTIEZONE',w-188,43);
+  }
+}
+
+
+async function recordSmoothSceneVideo(){
+  const btn=$('vidBtn'), info=$('vidStatus'), dl=$('vidDownload');
+  if(!window.MediaRecorder){
+    info.textContent='Video-opname niet ondersteund door deze browser.';
+    return;
+  }
+
+  btn.disabled=true;
+  $('vidFullBtn').disabled=true;
+  btn.classList.add('recording');
+  dl.style.display='none';
+
+  const wasRunning=running;
+  running=false; // recorder runs its own deterministic simulation
+
+  const canvas=$('recordCanvas');
+  canvas.width=900;
+  canvas.height=500;
+  const ctx=canvas.getContext('2d',{alpha:false});
+
+  const fps=getRecordFps();
+  const seconds=getRecordSeconds();
+  const totalFrames=fps*seconds;
+  const stream=canvas.captureStream(fps);
+
+  let mime='video/webm;codecs=vp9';
+  if(!MediaRecorder.isTypeSupported(mime)) mime='video/webm;codecs=vp8';
+  if(!MediaRecorder.isTypeSupported(mime)) mime='video/webm';
+
+  const chunks=[];
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6500000});
+  rec.ondataavailable=e=>{if(e.data && e.data.size)chunks.push(e.data)};
+
+  const p=pvals(), q=model(p);
+
+  // local deterministic recorder states
+  let rx1=x1, rx2=x2, rt=0;
+
+  function recorderStep(dt){
+    if(!(q.keff>0)){rx1=0;rx2=0;return;}
+    const f=(t,a,b)=>[b,(p.Menv*Math.cos(q.wf*t)-q.c*b-q.keff*a)/q.I];
+    const k1=f(rt,rx1,rx2);
+    const k2=f(rt+dt/2,rx1+dt*k1[0]/2,rx2+dt*k1[1]/2);
+    const k3=f(rt+dt/2,rx1+dt*k2[0]/2,rx2+dt*k2[1]/2);
+    const k4=f(rt+dt,rx1+dt*k3[0],rx2+dt*k3[1]);
+    rx1 += dt*(k1[0]+2*k2[0]+2*k3[0]+k4[0])/6;
+    rx2 += dt*(k1[1]+2*k2[1]+2*k3[1]+k4[1])/6;
+    rt += dt;
+  }
+
+  function drawRecordedFrame(){
+    const oldX1=x1, oldX2=x2;
+    x1=rx1; x2=rx2;
+    drawRecorderScene(ctx,canvas.width,canvas.height,p,q,rt);
+    x1=oldX1; x2=oldX2;
+  }
+
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const url=URL.createObjectURL(blob);
+    if(dl.dataset.prevUrl)URL.revokeObjectURL(dl.dataset.prevUrl);
+    dl.dataset.prevUrl=url;
+    dl.href=url;
+    const rText=Number.isFinite(q.r)?q.r.toFixed(2):'NA';
+    dl.download='monopile_gripper_FIXED_'+fps+'fps_r_'+rText+'_'+seconds+'s.webm';
+    dl.textContent='⬇ Download '+fps+' fps video';
+    dl.style.display='inline-block';
+    info.textContent='Video klaar: '+fps+' fps, '+seconds+' s. Klik op Download.';
+    btn.disabled=false;
+    $('vidFullBtn').disabled=false;
+    btn.classList.remove('recording');
+    running=wasRunning;
+  };
+
+  rec.start(250);
+  info.textContent='Vaste-FPS opname gestart…';
+
+  const frameDt=1/fps;
+  let frameIndex=0;
+
+  async function renderNext(){
+    if(frameIndex>=totalFrames){
+      setTimeout(()=>{
+        rec.stop();
+        stream.getTracks().forEach(t=>t.stop());
+      },150);
+      return;
+    }
+
+    // Use several physics substeps per video frame for numerical stability
+    const substeps=4;
+    const h=frameDt/substeps;
+    for(let i=0;i<substeps;i++) recorderStep(h);
+
+    drawRecordedFrame();
+
+    frameIndex++;
+    info.textContent='Opname '+fps+' fps: '+(frameIndex/fps).toFixed(1)+' / '+seconds+' s';
+
+    // advance with a controlled cadence; no dependence on requestAnimationFrame rate
+    setTimeout(renderNext, Math.max(0, Math.round(1000/fps)));
+  }
+
+  drawRecordedFrame();
+  renderNext();
+}
+
+function recordSceneVideo(){
+  const rNow=model(pvals());
+  const rText=Number.isFinite(rNow.r)?rNow.r.toFixed(2):'NA';
+  const seconds=getRecordSeconds(); recordElementWebM($('scene'),seconds,'monopile_gripper_scene_r_'+rText+'_'+seconds+'s.webm',$('vidBtn'));
+}
+function recordFullVideo(){
+  const rNow=model(pvals());
+  const rText=Number.isFinite(rNow.r)?rNow.r.toFixed(2):'NA';
+  const seconds=getRecordSeconds(); recordElementWebM(document.querySelector('.wrap'),seconds,'monopile_gripper_FULL_SHEET_r_'+rText+'_'+seconds+'s.webm',$('vidFullBtn'));
+}
+
+document.querySelectorAll('input[type=range]').forEach(el=>{
+  if(el.id!=='rTarget') el.addEventListener('input',()=>{
+    updateStatic();
+    const q=model(pvals());
+    if(Number.isFinite(q.r)) $('rTarget').value=Math.max(.2,Math.min(2.2,q.r)).toFixed(2);
+    $('vr').textContent=(+$('rTarget').value).toFixed(2);
+  });
+});
+$('rTarget').addEventListener('input',()=>{
+  syncTfFromR();
+  updateStatic();
+});
+$('play').addEventListener('click',()=>running=true);
+$('pause').addEventListener('click',()=>running=false);
+$('reset').addEventListener('click',resetLive);
+$('gifBtn').addEventListener('click',recordGif10s);
+$('gifFullBtn').addEventListener('click',recordFullGif10s);
+$('vidBtn').addEventListener('click',recordSmoothSceneVideo);
+$('vidFullBtn').addEventListener('click',recordFullVideo);
+syncTfFromR();
+updateStatic();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
