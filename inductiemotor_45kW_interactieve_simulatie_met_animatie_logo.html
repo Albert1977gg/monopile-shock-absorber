@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>45 kW Inductiemotor – Interactieve αβ-simulatie</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --panel:#ffffff; --text:#172033; --muted:#667085;
+    --line:#d7deea; --blue:#2563eb; --orange:#ea580c; --green:#15803d;
+    --red:#dc2626; --purple:#7c3aed; --shadow:0 8px 25px rgba(20,33,61,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:1500px;margin:auto;padding:20px}
+  .hero{background:linear-gradient(135deg,#0f2f66,#1f5fbf);color:white;border-radius:20px;padding:22px 24px;box-shadow:var(--shadow)}
+  .hero h1{margin:0 0 6px;font-size:clamp(24px,3vw,38px)}
+  .hero p{margin:0;opacity:.92;line-height:1.5}
+  .layout{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:18px;margin-top:18px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+  .controls{padding:18px;align-self:start;position:sticky;top:12px}
+  .section-title{font-weight:800;font-size:16px;margin:2px 0 12px}
+  .control{padding:10px 0;border-bottom:1px solid #edf1f7}
+  .control:last-child{border-bottom:0}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .label{font-size:13px;font-weight:700}
+  .value{font-variant-numeric:tabular-nums;font-weight:800;color:var(--blue);white-space:nowrap}
+  input[type=range]{width:100%;accent-color:var(--blue)}
+  .buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  button{border:0;border-radius:10px;padding:11px 12px;font-weight:800;cursor:pointer}
+  .primary{background:var(--blue);color:white}
+  .secondary{background:#edf3ff;color:#174ea6}
+  .note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px}
+  .main{min-width:0}
+  .kpis{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px}
+  .kpi span{display:block;font-size:12px;color:var(--muted)}
+  .kpi strong{display:block;margin-top:3px;font-size:20px;font-variant-numeric:tabular-nums}
+  .graphs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}
+  .chart-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+  .chart-title h3{font-size:15px;margin:0}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+  canvas{width:100%;height:285px;display:block;background:#fff;border-radius:10px}
+  .equations{margin-top:12px;padding:16px 18px}
+  .eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .eq{background:#f8fafc;border:1px solid #e5eaf2;border-radius:12px;padding:12px;font-family:Cambria,Georgia,serif;line-height:1.55;overflow:auto}
+  .status{margin-top:10px;padding:10px 12px;border-radius:10px;background:#eef8f0;color:#166534;font-size:13px;font-weight:700}
+  .small{font-size:12px;color:var(--muted)}
+
+  .animation-panel{margin-top:12px;padding:16px 18px}
+  .anim-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .anim-grid{display:grid;grid-template-columns:minmax(320px,1.2fr) minmax(260px,.8fr);gap:14px;align-items:stretch}
+  .motor-stage{background:#f8fafc;border:1px solid #e5eaf2;border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:center;min-height:360px}
+  .motor-stage svg{width:100%;max-width:610px;height:auto;display:block}
+  .anim-side{display:flex;flex-direction:column;gap:10px}
+  .anim-data{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .anim-metric{border:1px solid #e5eaf2;background:#fff;border-radius:11px;padding:10px}
+  .anim-metric span{display:block;color:var(--muted);font-size:11px}
+  .anim-metric strong{display:block;margin-top:3px;font-size:17px;font-variant-numeric:tabular-nums}
+  .anim-controls{background:#f8fafc;border:1px solid #e5eaf2;border-radius:12px;padding:11px}
+  .anim-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .anim-buttons button{min-width:105px}
+  .anim-note{font-size:12px;color:var(--muted);line-height:1.45}
+  .anim-tag{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf3ff;color:#174ea6;font-size:11px;font-weight:800}
+  .slot{fill:#dbe2ec;stroke:#8a97a8;stroke-width:1}
+  .rotor-bar{fill:#94a3b8;stroke:#64748b;stroke-width:1}
+  .field-line{stroke:#dc2626;stroke-width:5;stroke-linecap:round}
+  .flux-line{stroke:#7c3aed;stroke-width:4;stroke-linecap:round}
+  .shaft{fill:#e2e8f0;stroke:#475569;stroke-width:3}
+  .rotor-core{fill:#eef2f7;stroke:#475569;stroke-width:3}
+  .stator-ring{fill:none;stroke:#334155;stroke-width:9}
+  .airgap{fill:none;stroke:#cbd5e1;stroke-width:2;stroke-dasharray:4 5}
+  .load-arrow{stroke:#ea580c;stroke-width:5;stroke-linecap:round}
+
+  .brandbar{display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .brandmark{display:flex;align-items:center;justify-content:center;width:78px;height:78px;border-radius:18px;
+    background:linear-gradient(135deg,#ffffff 0%,#dbeafe 100%); color:#0f2f66; box-shadow:0 10px 25px rgba(0,0,0,.18)}
+  .brandmark svg{width:62px;height:62px;display:block}
+  .brandtext{display:flex;flex-direction:column;gap:2px}
+  .brandtitle{font-size:30px;font-weight:900;letter-spacing:.5px;line-height:1}
+  .brandsub{font-size:14px;font-weight:700;opacity:.95;letter-spacing:.08em;text-transform:uppercase}
+  .brandtag{font-size:13px;opacity:.88}
+  @media(max-width:1050px){.layout{grid-template-columns:1fr}.controls{position:static}.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:760px){.graphs,.eqgrid,.anim-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}canvas{height:250px}.motor-stage{min-height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+
+    <div class="brandbar">
+      <div class="brandmark" aria-label="ADG Engineering logo">
+        <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="adgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0f2f66"/>
+              <stop offset="100%" stop-color="#2563eb"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="44" fill="white" stroke="url(#adgGrad)" stroke-width="5"/>
+          <path d="M20 70 L38 25 L56 70 M26 56 H50" fill="none" stroke="url(#adgGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M64 31 H78 C86 31 91 37 91 50 C91 63 85 69 77 69 H64 Z" fill="none" stroke="url(#adgGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M78 50 H88" stroke="url(#adgGrad)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M62 80 H89" stroke="#0f2f66" stroke-width="4" stroke-linecap="round" opacity="0.25"/>
+        </svg>
+      </div>
+      <div class="brandtext">
+        <div class="brandtitle">ADG Engineering</div>
+        <div class="brandsub">System Dynamics &amp; Simulation</div>
+        <div class="brandtag">Interactie • Modellering • Analyse</div>
+      </div>
+    </div>
+
+    <h1>45 kW inductiemotor – interactieve αβ-simulatie</h1>
+    <p>Direct-on-line model met vijf toestanden: <b>i<sub>sα</sub>, i<sub>sβ</sub>, ψ<sub>rα</sub>, ψ<sub>rβ</sub>, ω<sub>m</sub></b>. Verander de motor- en belastingsparameters en bekijk direct het effect op snelheid, koppel, stroom en rotorflux.</p>
+  </section>
+
+  <div class="layout">
+    <aside class="panel controls">
+      <div class="section-title">Motor & voeding</div>
+
+      <div class="control"><div class="row"><span class="label">Lijnspanning VLL</span><span class="value" id="vVLL"></span></div><input id="VLL" type="range" min="200" max="500" step="5" value="400"></div>
+      <div class="control"><div class="row"><span class="label">Frequentie f</span><span class="value" id="vf"></span></div><input id="f" type="range" min="20" max="70" step="1" value="50"></div>
+      <div class="control"><div class="row"><span class="label">Poolparen p</span><span class="value" id="vp"></span></div><input id="p" type="range" min="1" max="4" step="1" value="2"></div>
+      <div class="control"><div class="row"><span class="label">Belastingskoppel TL</span><span class="value" id="vTL"></span></div><input id="TL" type="range" min="0" max="450" step="5" value="292"></div>
+      <div class="control"><div class="row"><span class="label">Belastingssprong op t</span><span class="value" id="vTstep"></span></div><input id="Tstep" type="range" min="0" max="2.8" step="0.1" value="1.5"></div>
+      <div class="control"><div class="row"><span class="label">Traagheidsmoment J</span><span class="value" id="vJ"></span></div><input id="J" type="range" min="0.10" max="2.50" step="0.05" value="0.80"></div>
+
+      <div class="section-title" style="margin-top:16px">Elektrische parameters</div>
+      <div class="control"><div class="row"><span class="label">Statorweerstand Rs</span><span class="value" id="vRs"></span></div><input id="Rs" type="range" min="0.020" max="0.120" step="0.005" value="0.055"></div>
+      <div class="control"><div class="row"><span class="label">Rotorweerstand Rr</span><span class="value" id="vRr"></span></div><input id="Rr" type="range" min="0.020" max="0.120" step="0.005" value="0.045"></div>
+      <div class="control"><div class="row"><span class="label">Magnetiseringsinductantie Lm</span><span class="value" id="vLm"></span></div><input id="Lm" type="range" min="10" max="60" step="1" value="28"></div>
+      <div class="control"><div class="row"><span class="label">Lekinductantie Lσs = Lσr</span><span class="value" id="vLsig"></span></div><input id="Lsig" type="range" min="0.3" max="4.0" step="0.1" value="1.2"></div>
+      <div class="control"><div class="row"><span class="label">Viskeuze wrijving B</span><span class="value" id="vB"></span></div><input id="B" type="range" min="0" max="0.100" step="0.005" value="0.020"></div>
+      <div class="control"><div class="row"><span class="label">Simulatietijd</span><span class="value" id="vTend"></span></div><input id="Tend" type="range" min="1.5" max="5.0" step="0.5" value="3.0"></div>
+
+      <div class="buttons">
+        <button class="primary" id="run">Simuleer opnieuw</button>
+        <button class="secondary" id="reset">45 kW standaard</button>
+      </div>
+      <div class="note">De belasting wordt bij de gekozen tijd aangelegd. Rond stilstand wordt het belastingskoppel met een <b>tanh</b>-functie glad gemaakt, zodat een weerstandskoppel niet kunstmatig de as achteruit trekt.</div>
+    </aside>
+
+    <main class="main">
+      <div class="kpis">
+        <div class="kpi"><span>Eindsnelheid</span><strong id="kRpm">–</strong></div>
+        <div class="kpi"><span>Synchrone snelheid</span><strong id="kSync">–</strong></div>
+        <div class="kpi"><span>Slip einde</span><strong id="kSlip">–</strong></div>
+        <div class="kpi"><span>Piek |is|</span><strong id="kIpk">–</strong></div>
+        <div class="kpi"><span>Eindkoppel Te</span><strong id="kTe">–</strong></div>
+      </div>
+
+      <section class="graphs">
+        <div class="chart-card">
+          <div class="chart-title"><h3>Snelheid</h3><div class="legend"><span><i class="dot" style="background:#2563eb"></i>rotor rpm</span><span><i class="dot" style="background:#dc2626"></i>synchroon</span></div></div>
+          <canvas id="speed"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><h3>Koppel</h3><div class="legend"><span><i class="dot" style="background:#ea580c"></i>Te</span><span><i class="dot" style="background:#7c3aed"></i>TL</span></div></div>
+          <canvas id="torque"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><h3>Statorstroom</h3><div class="legend"><span><i class="dot" style="background:#15803d"></i>|is|</span></div></div>
+          <canvas id="current"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><h3>Rotorfluxbaan</h3><div class="legend"><span><i class="dot" style="background:#7c3aed"></i>ψrβ versus ψrα</span></div></div>
+          <canvas id="flux"></canvas>
+        </div>
+      </section>
+
+
+      <section class="panel animation-panel">
+        <div class="anim-head">
+          <div>
+            <div class="section-title" style="margin-bottom:4px">Animatie – draaiend statorveld, rotor en slip</div>
+            <div class="small">De animatie volgt dezelfde berekende simulatie. De fysieke rotatie is alleen visueel vertraagd; de tijd, rpm, koppel, stroom en slip blijven de echte modelwaarden.</div>
+          </div>
+          <span class="anim-tag">Rotatie visueel ×0,04</span>
+        </div>
+
+        <div class="anim-grid">
+          <div class="motor-stage">
+            <svg viewBox="0 0 600 390" role="img" aria-label="Animatie van een inductiemotor met draaiend statorveld en rotor">
+              <defs>
+                <marker id="arrowRed" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 z" fill="#dc2626"></path>
+                </marker>
+                <marker id="arrowPurple" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 z" fill="#7c3aed"></path>
+                </marker>
+                <marker id="arrowOrange" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 z" fill="#ea580c"></path>
+                </marker>
+              </defs>
+
+              <text x="300" y="24" text-anchor="middle" font-size="16" font-weight="800" fill="#172033">INDUCTIEMOTOR – fysische animatie</text>
+
+              <g transform="translate(300 205)">
+                <circle r="136" class="stator-ring"></circle>
+                <circle r="111" class="airgap"></circle>
+
+                <g id="statorSlots">
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(30)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(60)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(90)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(120)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(150)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(180)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(210)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(240)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(270)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(300)"></rect>
+                  <rect class="slot" x="-11" y="-145" width="22" height="25" rx="3" transform="rotate(330)"></rect>
+                </g>
+
+                <g id="rotorGroup">
+                  <circle r="88" class="rotor-core"></circle>
+                  <circle r="20" class="shaft"></circle>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(30)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(60)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(90)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(120)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(150)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(180)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(210)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(240)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(270)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(300)"></rect>
+                  <rect class="rotor-bar" x="-5" y="-78" width="10" height="28" rx="3" transform="rotate(330)"></rect>
+                  <line x1="0" y1="0" x2="0" y2="-70" stroke="#2563eb" stroke-width="4" stroke-linecap="round"></line>
+                  <polygon points="-7,-64 7,-64 0,-78" fill="#2563eb"></polygon>
+                </g>
+
+                <g id="fieldGroup">
+                  <line x1="0" y1="0" x2="0" y2="-124" class="field-line" marker-end="url(#arrowRed)"></line>
+                  <text x="8" y="-98" font-size="12" font-weight="800" fill="#dc2626">statorveld</text>
+                </g>
+
+                <g id="fluxGroup">
+                  <line x1="0" y1="0" x2="0" y2="-102" class="flux-line" marker-end="url(#arrowPurple)"></line>
+                </g>
+              </g>
+
+              <line x1="500" y1="205" x2="550" y2="205" class="load-arrow" marker-end="url(#arrowOrange)"></line>
+              <text x="525" y="188" text-anchor="middle" font-size="12" font-weight="800" fill="#ea580c">Tₗ</text>
+
+              <g font-size="12" fill="#475569">
+                <circle cx="35" cy="337" r="5" fill="#dc2626"></circle><text x="48" y="341">synchroon statorveld</text>
+                <circle cx="214" cy="337" r="5" fill="#2563eb"></circle><text x="227" y="341">mechanische rotor</text>
+                <circle cx="381" cy="337" r="5" fill="#7c3aed"></circle><text x="394" y="341">rotorfluxvector ψᵣ</text>
+              </g>
+
+              <text id="animCaption" x="300" y="374" text-anchor="middle" font-size="13" font-weight="800" fill="#172033">t = 0,00 s</text>
+            </svg>
+          </div>
+
+          <div class="anim-side">
+            <div class="anim-data">
+              <div class="anim-metric"><span>Tijd</span><strong id="aTime">0,00 s</strong></div>
+              <div class="anim-metric"><span>Rotor</span><strong id="aRpm">0 rpm</strong></div>
+              <div class="anim-metric"><span>Synchroon</span><strong id="aSync">1500 rpm</strong></div>
+              <div class="anim-metric"><span>Slip</span><strong id="aSlip">100,00 %</strong></div>
+              <div class="anim-metric"><span>Elektromagn. koppel</span><strong id="aTe">0 Nm</strong></div>
+              <div class="anim-metric"><span>Belasting</span><strong id="aTL">0 Nm</strong></div>
+              <div class="anim-metric"><span>|iₛ|</span><strong id="aI">0 A</strong></div>
+              <div class="anim-metric"><span>|ψᵣ|</span><strong id="aFlux">0 Wb</strong></div>
+            </div>
+
+            <div class="anim-controls">
+              <div class="anim-buttons">
+                <button type="button" class="primary" id="animPlay">Pauze</button>
+                <button type="button" class="secondary" id="animRestart">Opnieuw</button>
+              </div>
+              <div class="row" style="margin:4px 0 3px">
+                <span class="label">Tijdlijn</span><span class="value" id="animScrubLabel">0,00 s</span>
+              </div>
+              <input id="animScrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Animatietijd">
+            </div>
+
+            <div class="anim-note">
+              <b>Wat zie je?</b><br>
+              Rood = het synchrone magnetische draaiveld. Blauw = de echte mechanische rotor. Paars = de berekende rotorfluxvector in het stationaire αβ-vlak. Zodra belasting wordt aangelegd, stijgt de benodigde slip en dus het elektromagnetische koppel.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel equations">
+        <div class="section-title">Model dat de browser numeriek oplost</div>
+        <div class="eqgrid">
+          <div class="eq">
+            <b>Toestanden</b><br>
+            x = [ i<sub>sα</sub>, i<sub>sβ</sub>, ψ<sub>rα</sub>, ψ<sub>rβ</sub>, ω<sub>m</sub> ]<sup>T</sup><br><br>
+            L<sub>s</sub>=L<sub>σs</sub>+L<sub>m</sub>, &nbsp; L<sub>r</sub>=L<sub>σr</sub>+L<sub>m</sub><br>
+            σ=1−L<sub>m</sub><sup>2</sup>/(L<sub>s</sub>L<sub>r</sub>), &nbsp; T<sub>r</sub>=L<sub>r</sub>/R<sub>r</sub><br>
+            ω<sub>e</sub>=pω<sub>m</sub>
+          </div>
+          <div class="eq">
+            <b>Koppel & mechanica</b><br>
+            T<sub>e</sub>=(3/2)p(L<sub>m</sub>/L<sub>r</sub>)(ψ<sub>rα</sub>i<sub>sβ</sub>−ψ<sub>rβ</sub>i<sub>sα</sub>)<br><br>
+            dω<sub>m</sub>/dt=(T<sub>e</sub>−T<sub>L,eff</sub>−Bω<sub>m</sub>)/J<br><br>
+            T<sub>L,eff</sub>=T<sub>L,cmd</sub> tanh(ω<sub>m</sub>/0.5)
+          </div>
+        </div>
+        <div class="status" id="status">Model wordt berekend…</div>
+        <div class="small" style="margin-top:8px">Numeriek: vaste stap Δt = 0,0002 s, RK4. Dit sluit aan bij de stapgrootte uit het oorspronkelijke Python-model.</div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const controls = ["VLL","f","p","TL","Tstep","J","Rs","Rr","Lm","Lsig","B","Tend"];
+  const defaults = {VLL:400,f:50,p:2,TL:292,Tstep:1.5,J:0.80,Rs:0.055,Rr:0.045,Lm:28,Lsig:1.2,B:0.020,Tend:3.0};
+
+  function num(id){ return Number($(id).value); }
+  function updateLabels(){
+    $("vVLL").textContent = num("VLL").toFixed(0)+" V";
+    $("vf").textContent = num("f").toFixed(0)+" Hz";
+    $("vp").textContent = num("p").toFixed(0);
+    $("vTL").textContent = num("TL").toFixed(0)+" Nm";
+    $("vTstep").textContent = num("Tstep").toFixed(1)+" s";
+    $("vJ").textContent = num("J").toFixed(2)+" kg·m²";
+    $("vRs").textContent = num("Rs").toFixed(3)+" Ω";
+    $("vRr").textContent = num("Rr").toFixed(3)+" Ω";
+    $("vLm").textContent = num("Lm").toFixed(0)+" mH";
+    $("vLsig").textContent = num("Lsig").toFixed(1)+" mH";
+    $("vB").textContent = num("B").toFixed(3)+" Nms/rad";
+    $("vTend").textContent = num("Tend").toFixed(1)+" s";
+  }
+
+  function deriv(t, x, P){
+    const [isa, isb, pra, prb, wm] = x;
+    const we = P.p * wm;
+
+    const va = P.Vhat * Math.sin(P.ws*t);
+    const vb = P.Vhat * Math.sin(P.ws*t - 2*Math.PI/3);
+    const vc = P.Vhat * Math.sin(P.ws*t + 2*Math.PI/3);
+    const vsa = (2/3)*(va - 0.5*vb - 0.5*vc);
+    const vsb = (2/3)*((Math.sqrt(3)/2)*vb - (Math.sqrt(3)/2)*vc);
+
+    const Te = 1.5*P.p*(P.Lm/P.Lr)*(pra*isb - prb*isa);
+    const TLcmd = t >= P.Tstep ? P.TL : 0;
+    const TLeff = TLcmd*Math.tanh(wm/0.5);
+
+    const disa = -P.gamma*isa + P.Kc*(pra/P.Tr + we*prb) + vsa/(P.sigma*P.Ls);
+    const disb = -P.gamma*isb + P.Kc*(prb/P.Tr - we*pra) + vsb/(P.sigma*P.Ls);
+    const dpra = (P.Lm/P.Tr)*isa - pra/P.Tr - we*prb;
+    const dprb = (P.Lm/P.Tr)*isb + we*pra - prb/P.Tr;
+    const dw = (Te - TLeff - P.B*wm)/P.J;
+    return [disa,disb,dpra,dprb,dw];
+  }
+
+  function addScaled(x,k,s){ return x.map((v,i)=>v+s*k[i]); }
+  function rk4(t,x,dt,P){
+    const k1=deriv(t,x,P);
+    const k2=deriv(t+dt/2,addScaled(x,k1,dt/2),P);
+    const k3=deriv(t+dt/2,addScaled(x,k2,dt/2),P);
+    const k4=deriv(t+dt,addScaled(x,k3,dt),P);
+    return x.map((v,i)=>v+dt*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6);
+  }
+
+  function simulate(){
+    const P = {
+      VLL:num("VLL"), f:num("f"), p:num("p"), TL:num("TL"), Tstep:num("Tstep"),
+      J:num("J"), Rs:num("Rs"), Rr:num("Rr"), Lm:num("Lm")/1000,
+      Lsig:num("Lsig")/1000, B:num("B"), Tend:num("Tend")
+    };
+    P.Ls=P.Lsig+P.Lm; P.Lr=P.Lsig+P.Lm;
+    P.sigma=1-(P.Lm*P.Lm)/(P.Ls*P.Lr);
+    P.Tr=P.Lr/P.Rr;
+    P.Kc=P.Lm/(P.sigma*P.Ls*P.Lr);
+    P.gamma=P.Rs/(P.sigma*P.Ls)+(P.Lm*P.Lm)/(P.sigma*P.Ls*P.Lr*P.Tr);
+    P.Vhat=Math.sqrt(2)*P.VLL/Math.sqrt(3);
+    P.ws=2*Math.PI*P.f;
+
+    if(!(P.sigma>0) || !Number.isFinite(P.gamma)){
+      $("status").textContent="Ongeldige parametercombinatie: controleer de inductanties.";
+      $("status").style.background="#fff0f0"; $("status").style.color="#991b1b";
+      return;
+    }
+
+    const dt=0.0002;
+    const N=Math.floor(P.Tend/dt);
+    const stride=Math.max(1,Math.floor(N/1500));
+    let x=[0,0,0,0,0], t=0;
+    const data={t:[],rpm:[],sync:[],te:[],tl:[],im:[],pra:[],prb:[],isa:[],isb:[],theta:[]};
+    let peakI=0, lastTe=0, thetaM=0;
+
+    for(let n=0;n<=N;n++){
+      const isa=x[0],isb=x[1],pra=x[2],prb=x[3],wm=x[4];
+      const Te=1.5*P.p*(P.Lm/P.Lr)*(pra*isb-prb*isa);
+      const I=Math.hypot(isa,isb);
+      peakI=Math.max(peakI,I); lastTe=Te;
+      if(n%stride===0 || n===N){
+        data.t.push(t);
+        data.rpm.push(wm*60/(2*Math.PI));
+        data.sync.push(60*P.f/P.p);
+        data.te.push(Te);
+        data.tl.push(t>=P.Tstep ? P.TL*Math.tanh(wm/0.5):0);
+        data.im.push(I);
+        data.pra.push(pra);
+        data.prb.push(prb);
+        data.isa.push(isa);
+        data.isb.push(isb);
+        data.theta.push(thetaM);
+      }
+      if(n<N){ x=rk4(t,x,dt,P); thetaM += x[4]*dt; t+=dt; }
+      if(!x.every(Number.isFinite)){
+        $("status").textContent="Simulatie werd numeriek instabiel. Kies minder extreme parameters.";
+        $("status").style.background="#fff0f0"; $("status").style.color="#991b1b";
+        return;
+      }
+    }
+
+    const rpm=x[4]*60/(2*Math.PI);
+    const sync=60*P.f/P.p;
+    const slip=(sync-rpm)/sync*100;
+    $("kRpm").textContent=rpm.toFixed(1)+" rpm";
+    $("kSync").textContent=sync.toFixed(0)+" rpm";
+    $("kSlip").textContent=slip.toFixed(2)+" %";
+    $("kIpk").textContent=peakI.toFixed(0)+" A";
+    $("kTe").textContent=lastTe.toFixed(1)+" Nm";
+
+    drawTimeChart($("speed"),data.t,[data.rpm,data.sync],["#2563eb","#dc2626"],"rpm");
+    drawTimeChart($("torque"),data.t,[data.te,data.tl],["#ea580c","#7c3aed"],"Nm");
+    drawTimeChart($("current"),data.t,[data.im],["#15803d"],"A");
+    drawXYChart($("flux"),data.pra,data.prb,"#7c3aed","Wb");
+
+    latestSim={P,data};
+    restartAnimation();
+
+    $("status").style.background="#eef8f0"; $("status").style.color="#166534";
+    $("status").textContent=`Klaar. σ=${P.sigma.toFixed(4)}, Tr=${P.Tr.toFixed(3)} s. Verschuif een slider om opnieuw te rekenen.`;
+  }
+
+  function prepCanvas(c){
+    const dpr=window.devicePixelRatio||1;
+    const rect=c.getBoundingClientRect();
+    c.width=Math.max(300,Math.floor(rect.width*dpr));
+    c.height=Math.max(180,Math.floor(rect.height*dpr));
+    const ctx=c.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx,w:rect.width,h:rect.height};
+  }
+
+  function niceBounds(values){
+    let mn=Infinity,mx=-Infinity;
+    for(const arr of values) for(const v of arr){if(Number.isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}}
+    if(!Number.isFinite(mn)||mn===mx){mn=0;mx=1}
+    const pad=(mx-mn)*0.08 || 1;
+    return [mn-pad,mx+pad];
+  }
+
+  function drawGrid(ctx,w,h,L,R,T,B,xmin,xmax,ymin,ymax,unit){
+    ctx.clearRect(0,0,w,h); ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#e7ebf2"; ctx.lineWidth=1; ctx.fillStyle="#667085"; ctx.font="11px Segoe UI";
+    for(let i=0;i<=5;i++){
+      const x=L+(w-L-R)*i/5; ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,h-B);ctx.stroke();
+      const xv=xmin+(xmax-xmin)*i/5;ctx.fillText(xv.toFixed(1),x-8,h-8);
+    }
+    for(let j=0;j<=4;j++){
+      const y=T+(h-T-B)*j/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();
+      const yv=ymax-(ymax-ymin)*j/4;ctx.fillText(yv.toFixed(Math.abs(yv)<10?1:0),4,y+4);
+    }
+    ctx.strokeStyle="#9aa4b2";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,h-B);ctx.lineTo(w-R,h-B);ctx.stroke();
+    ctx.fillStyle="#667085";ctx.fillText(unit,L+4,T+11);
+  }
+
+  function drawTimeChart(c,t,series,colors,unit){
+    const {ctx,w,h}=prepCanvas(c), L=50,R=12,T=12,B=30;
+    const [ymin,ymax]=niceBounds(series), xmin=0,xmax=t[t.length-1]||1;
+    drawGrid(ctx,w,h,L,R,T,B,xmin,xmax,ymin,ymax,unit);
+    const X=v=>L+(v-xmin)/(xmax-xmin)*(w-L-R);
+    const Y=v=>T+(ymax-v)/(ymax-ymin)*(h-T-B);
+    series.forEach((arr,s)=>{
+      ctx.strokeStyle=colors[s];ctx.lineWidth=1.8;ctx.beginPath();
+      for(let i=0;i<arr.length;i++){const x=X(t[i]),y=Y(arr[i]); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+      ctx.stroke();
+    });
+  }
+
+  function drawXYChart(c,xs,ys,color,unit){
+    const {ctx,w,h}=prepCanvas(c), L=50,R=12,T=12,B=30;
+    let maxAbs=0; for(let i=0;i<xs.length;i++) maxAbs=Math.max(maxAbs,Math.abs(xs[i]),Math.abs(ys[i]));
+    maxAbs=maxAbs*1.08||1; const xmin=-maxAbs,xmax=maxAbs,ymin=-maxAbs,ymax=maxAbs;
+    drawGrid(ctx,w,h,L,R,T,B,xmin,xmax,ymin,ymax,unit);
+    const X=v=>L+(v-xmin)/(xmax-xmin)*(w-L-R);
+    const Y=v=>T+(ymax-v)/(ymax-ymin)*(h-T-B);
+    ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.beginPath();
+    for(let i=0;i<xs.length;i++){const x=X(xs[i]),y=Y(ys[i]);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+    ctx.stroke();
+  }
+
+
+  let latestSim=null;
+  let animRAF=null;
+  let animRunning=true;
+  let animT=0;
+  let animStartT=0;
+  let animStartWall=0;
+  const visualRotationScale=0.04;
+
+  function animSample(t){
+    if(!latestSim || !latestSim.data.t.length) return null;
+    const d=latestSim.data;
+    const idx=Math.max(0,Math.min(d.t.length-1,Math.round((t/latestSim.P.Tend)*(d.t.length-1))));
+    return {
+      idx,
+      t:d.t[idx], rpm:d.rpm[idx], sync:d.sync[idx], te:d.te[idx], tl:d.tl[idx],
+      im:d.im[idx], pra:d.pra[idx], prb:d.prb[idx], isa:d.isa[idx], isb:d.isb[idx], theta:d.theta[idx]
+    };
+  }
+
+  function updateAnimation(t){
+    if(!latestSim) return;
+    const s=animSample(t);
+    if(!s) return;
+    const P=latestSim.P;
+    const sync=s.sync || 1;
+    const slip=((sync-s.rpm)/sync)*100;
+    const flux=Math.hypot(s.pra,s.prb);
+    const fieldMechanicalAngle=(P.ws*s.t/P.p)*visualRotationScale*180/Math.PI;
+    const rotorAngle=s.theta*visualRotationScale*180/Math.PI;
+    const fluxAngle=Math.atan2(s.prb,s.pra)*180/Math.PI + 90;
+
+    $("fieldGroup").setAttribute("transform",`rotate(${fieldMechanicalAngle} 0 0)`);
+    $("rotorGroup").setAttribute("transform",`rotate(${rotorAngle} 0 0)`);
+    $("fluxGroup").setAttribute("transform",`rotate(${fluxAngle} 0 0)`);
+
+    const loadOpacity=Math.max(0.18,Math.min(1,Math.abs(s.tl)/(Math.max(P.TL,1))));
+    const loadArrow=document.querySelector(".load-arrow");
+    if(loadArrow) loadArrow.style.opacity=loadOpacity.toFixed(2);
+
+    $("aTime").textContent=s.t.toFixed(2).replace(".",",")+" s";
+    $("aRpm").textContent=s.rpm.toFixed(0)+" rpm";
+    $("aSync").textContent=s.sync.toFixed(0)+" rpm";
+    $("aSlip").textContent=slip.toFixed(2).replace(".",",")+" %";
+    $("aTe").textContent=s.te.toFixed(1).replace(".",",")+" Nm";
+    $("aTL").textContent=s.tl.toFixed(1).replace(".",",")+" Nm";
+    $("aI").textContent=s.im.toFixed(0)+" A";
+    $("aFlux").textContent=flux.toFixed(3).replace(".",",")+" Wb";
+    $("animCaption").textContent=`t = ${s.t.toFixed(2).replace(".",",")} s   •   rotor ${s.rpm.toFixed(0)} rpm   •   slip ${slip.toFixed(2).replace(".",",")} %`;
+    $("animScrub").value=Math.round(1000*s.t/P.Tend);
+    $("animScrubLabel").textContent=s.t.toFixed(2).replace(".",",")+" s";
+  }
+
+  function animationFrame(now){
+    if(!animRunning || !latestSim) return;
+    animT=animStartT+(now-animStartWall)/1000;
+    if(animT>latestSim.P.Tend){
+      animT=0;
+      animStartT=0;
+      animStartWall=now;
+    }
+    updateAnimation(animT);
+    animRAF=requestAnimationFrame(animationFrame);
+  }
+
+  function startAnimation(){
+    if(!latestSim) return;
+    animRunning=true;
+    $("animPlay").textContent="Pauze";
+    animStartT=animT;
+    animStartWall=performance.now();
+    if(animRAF) cancelAnimationFrame(animRAF);
+    animRAF=requestAnimationFrame(animationFrame);
+  }
+
+  function pauseAnimation(){
+    animRunning=false;
+    $("animPlay").textContent="Afspelen";
+    if(animRAF){ cancelAnimationFrame(animRAF); animRAF=null; }
+  }
+
+  function restartAnimation(){
+    animT=0;
+    updateAnimation(0);
+    if(animRunning) startAnimation();
+    else $("animPlay").textContent="Afspelen";
+  }
+
+  $("animPlay").addEventListener("click",()=>{
+    if(animRunning) pauseAnimation(); else startAnimation();
+  });
+
+  $("animRestart").addEventListener("click",()=>{
+    animT=0;
+    updateAnimation(0);
+    if(animRunning) startAnimation();
+  });
+
+  $("animScrub").addEventListener("input",()=>{
+    if(!latestSim) return;
+    animT=(Number($("animScrub").value)/1000)*latestSim.P.Tend;
+    updateAnimation(animT);
+    if(animRunning){
+      animStartT=animT;
+      animStartWall=performance.now();
+    }
+  });
+
+  let timer=null;
+  controls.forEach(id=>{
+    $(id).addEventListener("input",()=>{
+      updateLabels();
+      clearTimeout(timer); timer=setTimeout(simulate,120);
+    });
+  });
+  $("run").addEventListener("click",simulate);
+  $("reset").addEventListener("click",()=>{
+    for(const [k,v] of Object.entries(defaults)) $(k).value=v;
+    updateLabels(); simulate();
+  });
+  window.addEventListener("resize",()=>{clearTimeout(timer);timer=setTimeout(simulate,150)});
+  updateLabels();
+  simulate();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>Hydraulic Dynamics Lab — Gelijkloopcilinders · Uitschuiven & Inschuiven</title>
+<style>
+:root{--bg:#080f19;--panel:#101d2b;--panel2:#142537;--panel3:#172a3c;--border:#294051;--text:#ebf5fc;--muted:#93aabb;--cyan:#52d7e8;--orange:#ffad69;--blue:#86adff;--green:#68deb0;--red:#ff7885;--white:#fff;--shadow:0 20px 50px rgba(0,0,0,.24)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse 75% 38% at 55% -6%,#193345 0%,transparent 66%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.5}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}.app{max-width:1820px;margin:0 auto;display:grid;grid-template-columns:322px minmax(0,1fr);min-height:100vh}.sidebar{background:#0d1825;border-right:1px solid var(--border);padding:29px 20px 30px 22px;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin}.brand{display:flex;align-items:center;gap:12px;padding:0 6px 25px;border-bottom:1px solid var(--border)}.brand-icon{height:43px;width:43px;display:grid;place-items:center;border:1px solid #397c86;border-radius:13px;background:linear-gradient(135deg,#214a57,#122333);color:var(--cyan);font-weight:900;font-size:23px;letter-spacing:-5px;padding-right:5px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2.1px;font-weight:800}.brand strong{display:block;font-size:17px;letter-spacing:-.5px;line-height:1.28}.side-title{color:var(--muted);font-size:10px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin:25px 6px 12px}.field{padding:10px 11px 15px;border:1px solid transparent;border-bottom-color:#203647}.field-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.field-label{color:#c8dbe7;font-weight:630;font-size:12px}.field-val{color:var(--cyan);font-size:12px;font-weight:850;font-variant-numeric:tabular-nums}input[type=range]{width:100%;appearance:none;background:linear-gradient(to right,var(--cyan) 0%,var(--cyan) var(--pct,50%),#294355 var(--pct,50%),#294355 100%);height:5px;border-radius:9px;outline:none;display:block;margin:0}input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;background:var(--cyan);border-radius:50%;border:3px solid #102331;box-shadow:0 0 0 1px var(--cyan)}input[type=range]::-moz-range-thumb{width:11px;height:11px;background:var(--cyan);border:3px solid #102331;border-radius:50%;cursor:pointer}.range-label{display:flex;justify-content:space-between;color:#617f91;font-size:10px;margin-top:8px}.sidebar button,.button{border-radius:10px;padding:12px 14px;border:1px solid var(--border);background:#1a2e3f;color:var(--text);font-weight:750;transition:background .2s,transform .2s}.sidebar button:hover,.button:hover{background:#294153}.button-primary{background:var(--cyan)!important;color:#05212a!important;border-color:var(--cyan)!important}.button-primary:hover{background:#a3f5ff!important}.side-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:23px}.side-actions button{font-size:11px;padding:12px 6px}.presets{display:flex;gap:7px;flex-wrap:wrap}.presets button{padding:7px 11px;font-size:12px;border-radius:8px;background:#152a3b;flex-grow:1}.presets button.active{background:#144657;color:#c9fbff;border-color:#4cb6c7}.side-note{font-size:11px;line-height:1.55;color:#819aa8;padding:16px 8px}.status{display:flex;align-items:center;gap:7px;color:#9ed9cd;font-size:11px;margin-top:12px}.status-dot{width:7px;height:7px;background:var(--green);box-shadow:0 0 12px var(--green);border-radius:50%;flex:none}.main{min-width:0;padding:32px clamp(20px,3%,48px) 65px}.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}.breadcrumbs{color:var(--muted);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}.pill{font-size:11px;background:#17333e;border:1px solid #286678;border-radius:40px;padding:7px 12px;color:#aceaf2;font-weight:800}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:2.1px;text-transform:uppercase;font-weight:850;margin-bottom:9px}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px}.hero h1{font-size:clamp(31px,3.35vw,52px);line-height:1.09;margin:0 0 14px;font-weight:850;letter-spacing:-2.25px}.hero h1 em{font-style:normal;color:var(--cyan)}.hero p{color:#a1b5c4;max-width:760px;font-size:14px;margin:0;line-height:1.7}.hero-side{min-width:160px;text-align:right;color:#8cabb8;font-size:12px;border-left:2px solid var(--cyan);padding-left:12px}.hero-side strong{font-size:19px;color:#fff;display:block}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 18px}.kpi{background:linear-gradient(145deg,#17283a,#11202e);border:1px solid var(--border);border-radius:15px;padding:17px 18px 16px;min-height:119px;position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:2px;background:var(--accent,var(--cyan));opacity:.65}.kpi .label{font-size:10px;color:#93aabb;font-weight:800;letter-spacing:1.1px;text-transform:uppercase}.kpi .number{font-size:clamp(23px,2.4vw,34px);letter-spacing:-1px;font-weight:800;margin-top:11px;line-height:1.1;font-variant-numeric:tabular-nums}.kpi .unit{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0}.kpi .sub{color:#8fa7b8;font-size:10px;margin-top:9px}.panel{background:linear-gradient(150deg,#112132,#0f1c2a);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow)}.panel-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 22px 0}.panel-heading{font-size:17px;letter-spacing:-.4px;font-weight:800}.panel-sub{color:var(--muted);font-size:11px}.schematic{padding:8px 20px 12px}.schematic svg{width:100%;height:auto;max-height:335px;display:block}.system-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #253c4c;margin:0 22px;padding:15px 0 17px;flex-wrap:wrap}.cylinder-key{display:flex;align-items:center;gap:19px;flex-wrap:wrap;color:#acbfca;font-size:11px}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}.play-controls{display:flex;align-items:center;gap:10px;flex:1;justify-content:flex-end;min-width:275px}.mini-button{width:37px;height:33px;border-radius:10px;background:#1c3748;color:var(--cyan);border:1px solid #3d697a;font-size:16px}.play-controls input{max-width:265px;flex:1}.time-label{font-size:12px;color:#b7d5e0;font-variant-numeric:tabular-nums;min-width:50px;text-align:right}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:33px 0 16px}.section-title h2{font-size:20px;margin:0;letter-spacing:-.6px}.section-title p{font-size:11px;color:var(--muted);margin:0}.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.chart-card{min-width:0;background:#101e2e;border:1px solid var(--border);border-radius:15px;overflow:hidden;position:relative}.chart-head{padding:18px 18px 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.chart-head h3{margin:0 0 3px;font-size:14px;font-weight:750}.chart-head span{font-size:10px;color:var(--muted)}.chart-btn{border:1px solid #304e60;color:#9fb8c8;background:#182c3c;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800;white-space:nowrap}.chart-btn:hover{color:#fff;border-color:#6695a9}.legend{display:flex;gap:14px;flex-wrap:wrap;padding:2px 18px 0;color:#b3c6d2;font-size:11px}.legend span:before{content:"";display:inline-block;width:14px;height:3px;background:var(--line);border-radius:5px;margin-right:6px;vertical-align:middle}.chart-body{position:relative;height:260px;padding:0 10px 7px}.chart-body canvas{width:100%;height:100%;display:block;cursor:crosshair}.tip{pointer-events:none;position:absolute;z-index:3;display:none;padding:9px 12px;border:1px solid #39586a;border-radius:9px;background:rgba(7,17,28,.96);box-shadow:0 8px 26px #0007;color:#eaf5ff;font-size:11px;font-variant-numeric:tabular-nums;min-width:136px}.tip .tip-t{color:#8caabc;margin-bottom:6px}.tip .r{display:flex;justify-content:space-between;gap:15px;line-height:1.7}.tip .r strong{font-weight:850}.note-banner{display:flex;align-items:flex-start;gap:14px;border:1px solid #665840;background:#2a281f;border-radius:12px;padding:13px 15px;margin-top:18px;color:#e9d6a5;font-size:12px;line-height:1.55}.note-banner strong{color:#ffdf99}.info-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:14px}.info-card{padding:22px 23px}.info-card h3{font-size:16px;margin:0 0 12px}.flow{display:grid;grid-template-columns:1fr 20px 1fr 20px 1fr 20px 1fr;align-items:center;gap:5px;margin:20px 0}.flow .block{text-align:center;background:#173041;border:1px solid #335569;padding:13px 6px;border-radius:10px;font-size:11px;font-weight:850;color:#bbebf2}.flow .arr{text-align:center;color:var(--orange);font-size:18px}.formula{padding:14px 15px;border-radius:10px;background:#0a1723;border:1px solid #254357;display:block;font-family:Georgia,Times,serif;font-size:16px;line-height:1.8;color:#e1f4fc;overflow-x:auto}.formula b{color:var(--cyan);font-weight:500}.explain{font-size:12px;color:#9eb4c2;line-height:1.75;margin:12px 0 0}.table-wrap{width:100%;overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px;min-width:400px}th,td{padding:9px 8px;border-bottom:1px solid #273c4e;text-align:right;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:#8cacc0}td{color:#c0d2df}td strong{color:var(--text)}.ref{color:var(--cyan)}.foot{margin-top:25px;padding-top:17px;border-top:1px solid var(--border);color:#758f9f;font-size:11px;display:flex;justify-content:space-between;gap:25px;flex-wrap:wrap}.sampling-select{border-radius:8px;background:#182d3e;border:1px solid #3c596a;color:#c8e5ef;padding:7px 11px;font-size:11px}.tiny{font-size:10px;color:#7e98a8}.warning-dot{color:var(--orange);font-weight:800}.c-svg-label{font-family:Inter,Arial,sans-serif;fill:#d2eaf4;font-size:14px;font-weight:650}.c-svg-small{font-family:Inter,Arial,sans-serif;fill:#809eaf;font-size:12px}.svg-dynamic{font-family:Inter,Arial,sans-serif;fill:#fff;font-size:16px;font-weight:800}.flowpath{fill:none;stroke:#2e7a91;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.flowpath-dash{fill:none;stroke:#6cdae8;stroke-width:2.8;stroke-dasharray:8 18;stroke-linecap:round;animation:oil 1.25s linear infinite;opacity:.85}.flowpath-dash.orange{stroke:#ffb070;animation-duration:.63s}@keyframes oil{to{stroke-dashoffset:-52}}.valve{fill:#163144;stroke:#6293a7;stroke-width:2}.preload{background:#142536;border:1px solid #39516b;color:#b0cfe2;padding:7px 11px;border-radius:9px;font-size:11px}.nowrap{white-space:nowrap} @media(max-width:1230px){.app{grid-template-columns:288px minmax(0,1fr)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-grid{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}}@media(max-width:830px){.app{display:block}.sidebar{position:relative;height:auto;overflow:visible;border-right:0;border-bottom:1px solid var(--border)}.brand{padding-bottom:15px}.side-fields{display:grid;grid-template-columns:1fr 1fr}.main{padding:25px 15px 48px}.hero{display:block}.hero h1{letter-spacing:-1.3px}.hero-side{display:none}.schematic{padding:4px 5px}.panel-header{padding:18px 15px 0}.system-bottom{margin:0 12px}.flow{grid-template-columns:1fr 14px 1fr;gap:4px}.flow .block:nth-of-type(n+4){margin-top:6px}}@media(max-width:480px){.side-fields{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr;gap:8px}.kpi{padding:14px 11px}.kpi .number{font-size:22px}.chart-body{height:240px}.flow{grid-template-columns:1fr;justify-items:stretch}.flow .arr{transform:rotate(90deg)}.section-title{align-items:flex-start;flex-direction:column}.hero h1{font-size:34px}}
+
+/* Cylinder direction controls */
+.mode-picker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:8px 0 5px}
+.mode-picker button{border:1px solid #305368;border-radius:9px;background:#152a3b;color:#a9c5d4;padding:10px 5px;font-size:11px;font-weight:850;min-height:47px}
+.mode-picker button:hover{background:#224359}
+.mode-picker button.active{background:#134a55;color:#d5faff;border-color:#4ccddf;box-shadow:inset 0 0 0 1px #225f69}
+.mode-description{font-size:11px;line-height:1.55;color:#9eb6c6;padding:9px 4px 4px;min-height:61px}
+.mode-indicator{border:1px solid #356b75;background:#103740;padding:7px 11px;border-radius:20px;color:#a9f4ef;font-size:11px;font-weight:850;letter-spacing:.3px}
+.mode-notice{border-left:3px solid var(--cyan);margin:10px 0 0;padding:7px 10px;color:#b7d1df;background:#142c3b;font-size:11px;line-height:1.65;border-radius:0 8px 8px 0}
+.motion-buttons{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.motion-buttons button{padding:7px 10px;border-radius:8px;border:1px solid #416679;color:#c4e3ee;background:#173445;font-size:11px;font-weight:800}
+.motion-buttons button.active{color:#062732;background:var(--cyan);border-color:var(--cyan)}
+@media (max-width:870px){.mode-picker{gap:4px}.motion-buttons{width:100%;justify-content:center}.motion-buttons button{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" aria-label="Simulatie-instellingen">
+  <div class="brand"><span class="brand-icon">∿</span><div><small>ENGINEERING / R&amp;D</small><strong>Hydraulic Dynamics<br>Lab</strong></div></div>
+  <div class="side-title">Scenariokeuze</div>
+  <div class="presets" id="presets"><button data-d1="2" data-d2="6" class="active">2 / 6 mm</button><button data-d1="3" data-d2="3">3 / 3 mm</button><button data-d1="6" data-d2="6">6 / 6 mm</button><button data-d1="2" data-d2="4">2 / 4 mm</button></div>
+  <div class="side-title">Cilinderbeweging</div>
+  <div class="mode-picker" id="modePicker" role="group" aria-label="Bewegingsrichting">
+   <button data-motion="paper" class="active" aria-pressed="true">◷ Paper<br>origineel</button>
+   <button data-motion="extend" aria-pressed="false">↗ Cilinders<br>uitschuiven</button>
+   <button data-motion="retract" aria-pressed="false">↙ Cilinders<br>inschuiven</button>
+  </div>
+  <div id="modeDescription" class="mode-description">Originele zes ODE's en krachttekens uit de paper: de resultaten zijn direct vergelijkbaar met tabel 4.1.</div>
+  <div class="side-title">Modelparameters</div>
+  <div class="side-fields">
+    <div class="field" data-field="d1"><div class="field-top"><label class="field-label" for="d1">Orifice cilinder 1</label><span class="field-val" id="d1Val">2,0 mm</span></div><input id="d1" type="range" min="1" max="10" step="0.1" value="2"/><div class="range-label"><span>1 mm</span><span>10 mm</span></div></div>
+    <div class="field" data-field="d2"><div class="field-top"><label class="field-label" for="d2">Orifice cilinder 2</label><span class="field-val" id="d2Val">6,0 mm</span></div><input id="d2" type="range" min="1" max="10" step="0.1" value="6"/><div class="range-label"><span>1 mm</span><span>10 mm</span></div></div>
+    <div class="field" data-field="ps"><div class="field-top"><label class="field-label" for="ps">Systeemdruk</label><span class="field-val" id="psVal">320 bar</span></div><input id="ps" type="range" min="50" max="400" step="10" value="320"/><div class="range-label"><span>50 bar</span><span>400 bar</span></div></div>
+    <div class="field" data-field="pb"><div class="field-top"><label class="field-label" for="pb">Tegendruk</label><span class="field-val" id="pbVal">20 bar</span></div><input id="pb" type="range" min="0" max="80" step="5" value="20"/><div class="range-label"><span>0 bar</span><span>80 bar</span></div></div>
+    <div class="field" data-field="mass"><div class="field-top"><label class="field-label" for="mass">Belasting per cilinder*</label><span class="field-val" id="massVal">120 ton</span></div><input id="mass" type="range" min="0" max="200" step="5" value="120"/><div class="range-label"><span>0 ton</span><span>200 ton</span></div></div>
+    <div class="field" data-field="e"><div class="field-top"><label class="field-label" for="e">Olie-bulkmodulus</label><span class="field-val" id="eVal">1,0 GPa</span></div><input id="e" type="range" min="0.5" max="2" step="0.1" value="1"/><div class="range-label"><span>0,5 GPa</span><span>2,0 GPa</span></div></div>
+    <div class="field" data-field="cq"><div class="field-top"><label class="field-label" for="cq">Orifice-coëfficiënt Cq</label><span class="field-val" id="cqVal">1,00</span></div><input id="cq" type="range" min="0.3" max="1" step="0.05" value="1"/><div class="range-label"><span>0,30</span><span>1,00 (paper)</span></div></div>
+    <div class="field" data-field="damp"><div class="field-top"><label class="field-label" for="damp">Viskeuze demping ×</label><span class="field-val" id="dampVal">1,0×</span></div><input id="damp" type="range" min="0.5" max="6" step="0.5" value="1"/><div class="range-label"><span>0,5×</span><span>6×</span></div></div>
+    <div class="field" data-field="T"><div class="field-top"><label class="field-label" for="T">Simulatieduur</label><span class="field-val" id="TVal">30 s</span></div><input id="T" type="range" min="5" max="30" step="5" value="30"/><div class="range-label"><span>5 s</span><span>30 s</span></div></div>
+  </div>
+  <div class="side-title">Weergave grafieken</div>
+  <select id="resolution" class="sampling-select" style="width:100%"><option value="100">Paper: 100 samples/s</option><option value="1000">Hoge resolutie: 1000 samples/s</option></select>
+  <div class="side-actions"><button class="button-primary" id="simulate">↻ Simuleer</button><button id="reset">↶ Reset paper</button><button id="exportCsv">↓ Exporteer CSV</button><button id="exportSummary">↓ Resultaten TXT</button></div>
+  <div class="status"><i class="status-dot"></i><span id="status">Model gereed</span></div>
+  <p class="side-note">*De oorspronkelijke paper past de volle lastkracht van 120 ton toe in beide bewegingsvergelijkingen. Deze interpretatie is bewust overgenomen voor reproduceerbaarheid. Geen gevalideerd hydraulisch ontwerpmodel.</p>
+</aside>
+<main class="main">
+ <div class="topline"><div class="breadcrumbs">Modellering / Hydrauliek / 6-toestandenmodel</div><div class="pill">● Interactieve ODE-simulatie</div></div>
+ <section class="hero"><div><div class="eyebrow">Model volgens het rapport · 6 november 2026</div><h1>Hydraulische <em>gelijkloopcilinders.</em></h1><p>Ontdek hoe <strong>orifice-diameter → volumestroom → druk → kracht → beweging</strong> elkaar beïnvloeden. Pas de parameters aan en vergelijk direct de twee cilinders in zes gekoppelde toestanden.</p></div><div class="hero-side"><strong>6 states</strong>2 cilinders · 4 basisgrafieken<br>ODE + RK4-integratie</div></section>
+ <section class="kpis" aria-label="Belangrijkste resultaten">
+  <div class="kpi" style="--accent:var(--cyan)"><div class="label">Startflowverhouding Q₂/Q₁</div><div class="number" id="ratio">9,00<span class="unit"> ×</span></div><div class="sub">Schaalt met (d₂/d₁)²</div></div>
+  <div class="kpi" style="--accent:var(--orange)"><div class="label">Eindverschil |x₂ − x₁|</div><div class="number" id="deltaEnd">1,31<span class="unit"> mm</span></div><div class="sub">Op t = <span id="endT">30</span> s</div></div>
+  <div class="kpi" style="--accent:var(--blue)"><div class="label">Grootste positieverschil</div><div class="number" id="deltaMax">—<span class="unit"> mm</span></div><div class="sub">Over de gesamplede tijdreeks</div></div>
+  <div class="kpi" style="--accent:var(--red)"><div class="label">Hoogste cilinderdruk</div><div class="number" id="pMax">538<span class="unit"> bar</span></div><div class="sub">Inclusief niet-begrensde pieken</div></div>
+ </section>
+ <section class="panel"><div class="panel-header"><div><div class="panel-heading">Hydraulisch principeschema</div><div class="panel-sub">Twee parallelle aftakkingen vanaf één ideale drukbron · <span id="chamberLabel">paper: bodemzijde gevoed</span></div></div><span class="preload">LIVE · <span id="liveTitle">t = 0,00 s</span></span><span class="mode-indicator" id="modeIndicator">PAPER</span></div>
+  <div class="schematic">
+   <svg viewBox="0 0 1090 340" role="img" aria-label="Schematische voorstelling van drukbron, orifices en twee hydraulische cilinders">
+    <defs><linearGradient id="tankg" x1="0" x2="1"><stop stop-color="#1a4553"/><stop offset="1" stop-color="#153141"/></linearGradient><linearGradient id="cyg" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#2f5867"/><stop offset="1" stop-color="#132c3b"/></linearGradient></defs>
+    <rect x="22" y="114" width="176" height="131" rx="16" fill="url(#tankg)" stroke="#4d8c9d" stroke-width="2"/>
+    <text x="110" y="147" class="c-svg-label" text-anchor="middle">POMP / HPU</text><text x="110" y="185" id="sourceP" text-anchor="middle" font-family="Inter,Arial" font-size="33" font-weight="850" fill="#51d6e8">320</text><text x="110" y="210" class="c-svg-small" text-anchor="middle">bar (constant)</text>
+    <path class="flowpath" d="M198 181 H249 V98 H323 M249 181 V261 H323"/><path class="flowpath-dash" d="M198 181 H249 V98 H323 M249 181 V261 H323"/>
+    <rect class="valve" x="323" y="75" width="98" height="47" rx="8"/><rect class="valve" x="323" y="237" width="98" height="47" rx="8"/>
+    <path d="M337 100 H406" stroke="#83e9f2" stroke-width="3"/><path d="M368 81 V118" stroke="#83e9f2" stroke-width="3"/><path d="M377 81 V118" stroke="#83e9f2" stroke-width="3"/>
+    <path d="M337 261 H406" stroke="#ffac70" stroke-width="3"/><path d="M368 242 V280" stroke="#ffac70" stroke-width="3"/><path d="M377 242 V280" stroke="#ffac70" stroke-width="3"/>
+    <text x="372" y="56" class="c-svg-small" text-anchor="middle" id="o1">Ø 2,0 mm</text><text x="372" y="305" class="c-svg-small" text-anchor="middle" id="o2">Ø 6,0 mm</text>
+    <path class="flowpath" d="M421 98 H657 M421 261 H657"/><path class="flowpath-dash" id="dash1" d="M421 98 H657"/><path class="flowpath-dash orange" id="dash2" d="M421 261 H657"/>
+    <rect x="657" y="61" width="260" height="74" rx="8" fill="url(#cyg)" stroke="#4f8996" stroke-width="2"/><rect x="657" y="224" width="260" height="74" rx="8" fill="url(#cyg)" stroke="#4f8996" stroke-width="2"/>
+    <path d="M660 98 H904 M660 261 H904" stroke="#306d80" stroke-width="2" stroke-dasharray="6 9"/>
+    <rect id="piston1" x="722" y="67" width="12" height="62" rx="2" fill="#60ddeb"/><rect id="piston2" x="722" y="230" width="12" height="62" rx="2" fill="#ffb076"/>
+    <rect id="rod1" x="734" y="91" width="220" height="14" rx="4" fill="#80acbf"/><rect id="rod2" x="734" y="254" width="220" height="14" rx="4" fill="#80acbf"/>
+    <rect id="end1" x="954" y="86" width="9" height="24" rx="3" fill="#94b9c7" stroke="#c5eaf6" stroke-width="1"/>
+    <rect id="end2" x="954" y="249" width="9" height="24" rx="3" fill="#94b9c7" stroke="#c5eaf6" stroke-width="1"/>
+    <rect x="906" y="59" width="12" height="78" rx="2" fill="#496c7a"/><rect x="906" y="222" width="12" height="78" rx="2" fill="#496c7a"/>
+    <text x="547" y="65" id="qVisual1" class="c-svg-small" text-anchor="middle">Q₁ = 50,5 L/min</text><text x="547" y="230" id="qVisual2" class="c-svg-small" text-anchor="middle">Q₂ = 454,9 L/min</text>
+    <text x="796" y="41" class="c-svg-label" text-anchor="middle">CILINDER 1</text><text x="796" y="204" class="c-svg-label" text-anchor="middle">CILINDER 2</text>
+    <text x="986" y="65" id="xVisual1" class="svg-dynamic" text-anchor="middle" fill="#51d7e8">0,0 mm</text><text x="986" y="228" id="xVisual2" class="svg-dynamic" text-anchor="middle">0,0 mm</text>
+    <text x="985" y="83" id="pVisual1" class="c-svg-small" text-anchor="middle">0 bar</text><text x="985" y="246" id="pVisual2" class="c-svg-small" text-anchor="middle">0 bar</text>
+    <text x="529" y="328" class="c-svg-small" text-anchor="middle" id="scaleLabel">Paper-modus: ~3 px/mm. Beweging is uitvergroot; niet op schaal.</text>
+   </svg>
+  </div>
+  <div class="system-bottom"><div class="motion-buttons"><button data-motion="extend" id="quickExtend">↗ Uitschuiven ▶</button><button data-motion="retract" id="quickRetract">↙ Inschuiven ▶</button></div><div class="cylinder-key"><span><i class="dot" style="background:var(--cyan)"></i>Cilinder 1</span><span><i class="dot" style="background:var(--orange)"></i>Cilinder 2</span><span id="currentDelta">Δx = 0,00 mm</span></div><div class="play-controls"><button id="play" class="mini-button" title="Start/pauze">▶</button><input id="timeline" type="range" min="0" max="3000" step="1" value="0" aria-label="Simulatietijd"/><span class="time-label" id="timelineVal">0,00 s</span></div></div>
+ </section>
+ <div id="motionNotice" class="mode-notice" aria-live="polite">Originele papervergelijkingen actief. Uitschuiven en inschuiven gebruiken een afzonderlijke, fysisch consistente uitbreidingsmodus.</div>
+ <section><div class="section-title"><h2 id="graphsTitle">Grafieken uit de paper</h2><div><span class="tiny">4 oorspronkelijke grootheden · hover voor meetwaarden · </span><span class="tiny" id="sampleLabel">100 samples/s</span></div></div>
+ <div class="chart-grid">
+  <article class="chart-card"><div class="chart-head"><div><h3>01 — Positie van de cilinders</h3><span>x₁(t) en x₂(t) · verplaatsing in mm</span></div><button class="chart-btn" data-export="position">↓ PNG</button></div><div class="legend"><span style="--line:var(--cyan)">x₁</span><span style="--line:var(--orange)">x₂</span></div><div class="chart-body"><canvas id="chart-position"></canvas><div class="tip" id="tip-position"></div></div></article>
+  <article class="chart-card"><div class="chart-head"><div><h3>02 — Cilindersnelheid</h3><span>v₁(t) en v₂(t) · mm/s</span></div><button class="chart-btn" data-export="velocity">↓ PNG</button></div><div class="legend"><span style="--line:var(--cyan)">v₁</span><span style="--line:var(--orange)">v₂</span></div><div class="chart-body"><canvas id="chart-velocity"></canvas><div class="tip" id="tip-velocity"></div></div></article>
+  <article class="chart-card"><div class="chart-head"><div><h3 id="pressureTitle">03 — Druk aan de bodemzijde</h3><span id="pressureSub">p₁(t) en p₂(t) · bar · stippellijn = systeemdruk</span></div><button class="chart-btn" data-export="pressure">↓ PNG</button></div><div class="legend"><span style="--line:var(--cyan)">p₁</span><span style="--line:var(--orange)">p₂</span></div><div class="chart-body"><canvas id="chart-pressure"></canvas><div class="tip" id="tip-pressure"></div></div></article>
+  <article class="chart-card"><div class="chart-head"><div><h3 id="flowTitle">04 — Ingaande orifice-flow</h3><span id="flowSub">Qᵢₙ,₁(t) en Qᵢₙ,₂(t) · L/min</span></div><button class="chart-btn" data-export="flow">↓ PNG</button></div><div class="legend"><span style="--line:var(--cyan)">Q₁</span><span style="--line:var(--orange)">Q₂</span></div><div class="chart-body"><canvas id="chart-flow"></canvas><div class="tip" id="tip-flow"></div></div></article>
+ </div></section>
+ <section><div class="section-title"><h2>De relaties zichtbaar gemaakt</h2><p>Twee extra analyses boven op de paper</p></div>
+ <div class="chart-grid">
+ <article class="chart-card"><div class="chart-head"><div><h3>05 — Gelijkloopfout</h3><span>Δx(t) = x₂(t) − x₁(t) · verschil in mm</span></div><button class="chart-btn" data-export="error">↓ PNG</button></div><div class="legend"><span style="--line:var(--blue)">Δx</span></div><div class="chart-body"><canvas id="chart-error"></canvas><div class="tip" id="tip-error"></div></div></article>
+ <article class="chart-card"><div class="chart-head"><div><h3>06 — Diameter versus startflow</h3><span>Q(0) ∝ d² bij de ingestelde systeemdruk</span></div><button class="chart-btn" data-export="sensitivity">↓ PNG</button></div><div class="legend"><span style="--line:var(--blue)">Theoretische curve</span><span style="--line:var(--cyan)">d₁</span><span style="--line:var(--orange)">d₂</span></div><div class="chart-body"><canvas id="chart-sensitivity"></canvas><div class="tip" id="tip-sensitivity"></div></div></article>
+ </div></section>
+ <div class="note-banner"><div style="font-size:19px;line-height:1">⚠</div><div><strong>Modelgrenzen.</strong> De originele paper heeft geen drukbegrenzing, cavitatie, lekverliezen of eindstops, zodat de oorspronkelijke grafieken niet zonder meer als ontwerpwaarden mogen worden gebruikt. De nieuwe <strong>uit-/inschuifmodi</strong> zijn een vereenvoudigde uitbreiding met omgeschakelde actieve cilinderkamer en een 600 mm bewegingsstop; die modi zijn <strong>niet</strong> afkomstig uit of gevalideerd door de paper. De integratiestap blijft 0,05 ms. Bij de paperinstellingen bedraagt de eigenfrequentie ongeveer 147 Hz; selecteer 1000 samples/s voor een betere weergave.</div></div>
+ <div class="section-title"><h2>Wat gebeurt er in het model?</h2><p>Feynman: van een kleine opening naar een grote beweging</p></div>
+ <section class="info-grid">
+  <div class="panel info-card"><h3>De oorzaak-gevolgketen</h3><div class="flow"><div class="block">Orifice<br>diameter</div><div class="arr">→</div><div class="block">Olieflow<br>Q<sub>in</sub></div><div class="arr">→</div><div class="block">Druk<br>p(t)</div><div class="arr">→</div><div class="block">Beweging<br>x(t)</div></div><div class="formula">A<sub>or</sub> = ¼πd² &nbsp; ; &nbsp; <b>Q<sub>in</sub> = C<sub>q</sub>A<sub>or</sub>√(2 max(p<sub>in</sub> − p, 0) / ρ)</b></div><p class="explain">Verdubbel je de orifice-diameter, dan wordt het oppervlak vier keer zo groot. Bij een <em>gelijk drukverschil</em> wordt de flow dus vier keer zo groot. In een dynamische simulatie verandert echter de cilinderdruk ook, waardoor de uiteindelijke beweging niet simpelweg vier keer zo groot wordt.</p></div>
+  <div class="panel info-card"><h3>Drukbalans en Newton</h3><div class="formula">ẋ<sub>i</sub> = v<sub>i</sub><br>ṗ<sub>i</sub> = (Q<sub>in,i</sub> − A<sub>b,i</sub>v<sub>i</sub>) / C<sub>ha,i</sub><br>v̇<sub>i</sub> = (F − p<sub>i</sub>A<sub>b,i</sub> + p<sub>b</sub>A<sub>a,i</sub> − c<sub>i</sub>v<sub>i</sub> − k<sub>i</sub>x<sub>i</sub>) / M<sub>i</sub></div><p class="explain">De getoonde formules gelden letterlijk voor de <strong>paper-modus</strong>. Een cilinder die beweegt, verbruikt flow: Q<sub>cil</sub> = A<sub>b</sub>v. Voor de nieuwe bewegingsmodi gebruiken we de bewegingscoördinaat u ≥ 0 in de gekozen richting met A<sub>actief</sub> = A<sub>b</sub> (uit) of A<sub>a</sub> (in): ṗ = (Q<sub>in</sub> − A<sub>actief</sub>u̇) / C<sub>actief</sub> en M<sub>eff</sub>ü = pA<sub>actief</sub> − p<sub>b</sub>A<sub>passief</sub> − F<sub>belasting</sub> − cu̇. Daarbij is M<sub>eff</sub> = M<sub>zuiger/stang</sub> + m<sub>belasting</sub>, en de cilinders stoppen op 0 en 600 mm. Dit is een aparte demonstratievariant zonder drukveiligheden.</p></div>
+ </section>
+ <div class="section-title"><h2>Controle met de oorspronkelijke paper</h2><p>Referentie: tabel 4.1 · 2 mm / 6 mm · 30 s · 100 samples/s</p></div>
+ <section class="panel info-card"><div class="table-wrap"><table><thead><tr><th>Grootheid</th><th>Paper C1</th><th>Model C1</th><th>Paper C2</th><th>Model C2</th></tr></thead><tbody id="validationBody"></tbody></table></div><p class="explain" id="validationInfo">De paperwaarden blijven vaststaan. Voor een exacte vergelijking selecteer je Paper origineel, 2 / 6 mm en 100 samples/s.</p></section>
+ <footer class="foot"><span>Gebaseerd op <strong>ODE-model en Python-simulatie voor hydraulische gelijkloopcilinders</strong> (6 nov. 2026), hoofdstuk 2–4 en bijlage A.</span><span>Volledig offline · HTML + CSS + JavaScript · geen externe bibliotheken</span></footer>
+</main>
+</div>
+<script>
+'use strict';
+/* Reproduction of equations 2.18–2.25 of the provided report.
+   Baseline numerical method: fixed-step fourth-order Runge–Kutta, h=0.00005 s.
+   Graph output sample rates: 100 Hz (paper) and 1000 Hz (improved display).
+   Paper values were obtained using SciPy DOP853 (rtol 1e-8, atol 1e-12). */
+const $=id=>document.getElementById(id), fmt=(v,d=2)=>Number.isFinite(v)?Number(v).toLocaleString('nl-NL',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const INPUTS={d1:2,d2:6,ps:320,pb:20,mass:120,e:1,cq:1,damp:1,T:30};
+let motionMode='paper';const strokeM=.600;
+const MODES={paper:{title:'PAPER',chamber:'paper: bodemzijde gevoed',scale:'Paper-modus: ~3 px/mm. Beweging is uitvergroot; niet op schaal.',description:'Originele zes ODE’s en krachttekens uit de paper. Dit is de referentie voor tabel 4.1.',notice:'Originele papervergelijkingen actief. De zuigerpositie is een kleine dynamische uitslag rond het startpunt; dit is geen volledige uitschuifbeweging.'},extend:{title:'UITSCHUIVEN',chamber:'uitschuiven: bodemzijde gevoed · stangzijde retour',scale:'Uitschuiven: 0–600 mm slag (schematisch geschaald).',description:'Druk op de bodemzijde: beide cilinders schuiven uit, maximaal 600 mm. De last werkt tegen de beweging.',notice:'Uitschuiven: bodemzijde ontvangt pompflow, stangzijde heeft 20 bar tegendruk. De grafieken tonen de fysieke, positieve uitschuifweg. Dit is een vereenvoudigde modeluitbreiding.'},retract:{title:'INSCHUIVEN',chamber:'inschuiven: stangzijde gevoed · bodemzijde retour',scale:'Inschuiven: 600–0 mm slag (schematisch geschaald).',description:'Druk op de stangzijde: beide cilinders schuiven in vanaf de maximale slag van 600 mm.',notice:'Inschuiven: stangzijde ontvangt pompflow, bodemzijde heeft de ingestelde tegendruk. De positie loopt van 600 naar 0 mm. Dit is een vereenvoudigde modeluitbreiding.'}};
+let data=null, config=null, hoverTime=null, animation=false, frame=null, animationMark=0, timeNow=0, recomputeTimer=0, chartMap={};
+function values(){const a={};for(const k of Object.keys(INPUTS))a[k]=Number($(k).value);a.sampleRate=Number($('resolution').value);return a;}
+function renderControlLabels(){const suffix={d1:' mm',d2:' mm',ps:' bar',pb:' bar',mass:' ton',e:' GPa',cq:'',damp:'×',T:' s'};for(const k in INPUTS){let el=$(k),value=Number(el.value),min=Number(el.min),max=Number(el.max);el.style.setProperty('--pct',((value-min)/(max-min)*100)+'%');$(k+'Val').textContent=fmt(value,(['d1','d2','e','damp'].includes(k)?1:k==='cq'?2:0))+suffix[k];}}
+function modelParameters(a){
+  const bore=.520,rod=.450,stroke=.600,piston=.100,pipeD=.020,pipeL=2,rhoSteel=7800,rhoOil=890,nu=46e-6;
+  const E=a.e*1e9,Ab=Math.PI*bore*bore/4,Arod=Math.PI*rod*rod/4,Aa=Ab-Arod, Vpipe=Math.PI*pipeD*pipeD/4*pipeL;
+  const M=rhoSteel*(Arod*stroke+piston*Ab);
+  const k=E*(Math.sqrt(Ab)+Math.sqrt(Aa))**2/(stroke+Vpipe/Ab+Vpipe/Aa);
+  const Ch=(Ab*stroke+Vpipe)/E;
+  const c=Math.PI*(rhoOil*nu)*bore*piston/(.09e-3)*a.damp;
+  return {ps:a.ps*1e5,pb:a.pb*1e5,F:a.mass*1000*9.81,E,Ab,Aa,M,k,Ch,c,rho:rhoOil,cq:a.cq,or1:Math.PI/4*(a.d1/1000)**2,or2:Math.PI/4*(a.d2/1000)**2,fn:Math.sqrt(k/M)/(2*Math.PI)};
+}
+function simulate(a, mode=motionMode){
+  const p=modelParameters(a), n=Math.round(a.T*a.sampleRate), stride=Math.round(20000/a.sampleRate), dt=.00005;
+  const isPaper=mode==='paper', isExtend=mode==='extend';
+  // In the motion modes u is the displacement in the commanded direction:
+  // extend -> physical x=u; retract -> physical x=stroke-u.
+  // Pressure state is the commanded (actively pressurized) chamber.
+  const Aactive=isPaper?p.Ab:(isExtend?p.Ab:p.Aa);
+  const Apassive=isPaper?p.Aa:(isExtend?p.Aa:p.Ab);
+  const ChActive=isPaper?p.Ch:(Aactive*strokeM+Math.PI/4*.020**2*2)/p.E;
+  // The paper uses rod/piston mass only. In the alternative modes, the entered
+  // external mass contributes to inertia in addition to its opposing weight.
+  const Meff=isPaper?p.M:p.M+a.mass*1000;
+  let y=[0,0,0,0,0,0], k1=new Float64Array(6),k2=new Float64Array(6),k3=new Float64Array(6),k4=new Float64Array(6), tmp=new Float64Array(6), valuesArr=new Array(n+1);
+  const qa=(pC,or)=>p.cq*or*Math.sqrt(2*Math.max(p.ps-pC,0)/p.rho);
+  function rhs(state,out){
+    for(let i=0;i<2;i++){let j=3*i,u=state[j],vel=state[j+1],press=state[j+2],orl=i===0?p.or1:p.or2;
+      if(isPaper){
+        // Original report Eq. (2.18-2.25), preserved verbatim.
+        out[j]=vel;
+        out[j+1]=(p.F-press*p.Ab+p.pb*p.Aa-p.c*vel-p.k*u)/p.M;
+        out[j+2]=(qa(press,orl)-p.Ab*vel)/p.Ch;
+      } else {
+        let force=press*Aactive-p.pb*Apassive-p.F-p.c*vel;
+        let atLow=u<=0&&vel<=0&&force<=0;
+        let atHigh=u>=strokeM&&vel>=0&&force>=0;
+        let stopped=atLow||atHigh;
+        out[j]=stopped?0:vel;
+        out[j+1]=stopped?0:force/Meff;
+        out[j+2]=(qa(press,orl)-Aactive*(stopped?0:vel))/ChActive;
+      }
+    }
+  }
+  function enforceLimits(){
+    if(isPaper)return;
+    for(const j of [0,3]){
+      if(y[j]<0){y[j]=0;if(y[j+1]<0)y[j+1]=0}
+      if(y[j]>strokeM){y[j]=strokeM;if(y[j+1]>0)y[j+1]=0}
+    }
+  }
+  function sample(t){
+    let phys=(j)=>isPaper?{x:y[j]*1000,v:y[j+1]*1000}:(isExtend?{x:y[j]*1000,v:y[j+1]*1000}:{x:(strokeM-y[j])*1000,v:-y[j+1]*1000});
+    let c1=phys(0),c2=phys(3),press1=y[2]*1e-5,press2=y[5]*1e-5;
+    return {t,x1:c1.x,x2:c2.x,v1:c1.v,v2:c2.v,p1:press1,p2:press2,q1:qa(y[2],p.or1)*60000,q2:qa(y[5],p.or2)*60000,dx:c2.x-c1.x};
+  }
+  valuesArr[0]=sample(0);
+  for(let sampleIdx=1;sampleIdx<=n;sampleIdx++){
+    for(let sub=0;sub<stride;sub++){
+      rhs(y,k1);
+      for(let j=0;j<6;j++)tmp[j]=y[j]+.5*dt*k1[j];rhs(tmp,k2);
+      for(let j=0;j<6;j++)tmp[j]=y[j]+.5*dt*k2[j];rhs(tmp,k3);
+      for(let j=0;j<6;j++)tmp[j]=y[j]+dt*k3[j];rhs(tmp,k4);
+      for(let j=0;j<6;j++)y[j]+=dt/6*(k1[j]+2*k2[j]+2*k3[j]+k4[j]);
+      enforceLimits();
+      if(!Number.isFinite(y[0]+y[1]+y[2]+y[3]+y[4]+y[5]))throw new Error('Numerieke instabiliteit; controleer de parameters.');
+    }
+    valuesArr[sampleIdx]=sample(sampleIdx/a.sampleRate);
+  }
+  return {rows:valuesArr,p};
+}
+const PRESETS=[['d1','2'],['d2','6']];
+function queueSim(){clearTimeout(recomputeTimer);$('status').textContent='Parameters gewijzigd…';recomputeTimer=setTimeout(runSimulation,170);}
+function stop(){animation=false;cancelAnimationFrame(frame);$('play').textContent='▶';}
+function runSimulation(){stop();const a=values();$('status').textContent='Numerieke ODE-integratie…';
+  try{const time=performance.now();let result=simulate(a,motionMode);data=result.rows;config={...result.p,...a,motion:motionMode};timeNow=0;hoverTime=null;
+    $('timeline').max=data.length-1;$('timeline').value=0;
+    $('status').textContent=`${MODES[motionMode].title}: ${fmt(performance.now()-time,0)} ms · ${data.length.toLocaleString('nl-NL')} punten`;
+    updateAll();$('sampleLabel').textContent=a.sampleRate+' samples/s';
+  }catch(e){$('status').textContent='Fout: '+e.message;console.error(e);}
+}
+function updateModeUI(){
+ const m=MODES[motionMode];
+ $('modeDescription').textContent=m.description;
+ $('graphsTitle').textContent=motionMode==='paper'?'Grafieken uit de paper':motionMode==='extend'?'Grafieken — uitschuiven':'Grafieken — inschuiven';
+ $('pressureTitle').textContent=motionMode==='retract'?'03 — Druk aan de stangzijde':'03 — Druk aan de bodemzijde';
+ $('pressureSub').textContent='p₁(t) en p₂(t) · bar · stippellijn = systeemdruk';
+ $('flowTitle').textContent=motionMode==='paper'?'04 — Ingaande orifice-flow':'04 — Orifice-flow naar de actieve kamer';
+ $('flowSub').textContent=motionMode==='retract'?'Qᵢₙ naar stangzijde · L/min':'Qᵢₙ naar bodemzijde · L/min';
+ $('modeIndicator').textContent=m.title;
+ $('chamberLabel').textContent=m.chamber;
+ $('scaleLabel').textContent=m.scale;
+ $('motionNotice').textContent=m.notice;
+ for(const b of document.querySelectorAll('[data-motion]')){
+   let selected=b.dataset.motion===motionMode;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected));
+ }
+ $('validationInfo').textContent=motionMode==='paper'?'Paper-modus geselecteerd: vergelijk de uitgangspunten met tabel 4.1.':'Deze bewegingsmodus is een aanvullende dynamische demonstratie; de papercijfers zijn alleen een referentie voor de originele paper-modus.';
+}
+function chooseMotion(mode,autoplay=false){
+ if(!MODES[mode])return;
+ motionMode=mode;
+ updateModeUI();
+ clearTimeout(recomputeTimer);
+ runSimulation();
+ if(autoplay)togglePlay();
+}
+function updateAll(){if(!data)return;let p=config,r=data, last=r[r.length-1], absmax=Math.max(...r.map(v=>Math.abs(v.dx)));
+ $('ratio').innerHTML=fmt(r[0].q1===0?0:r[0].q2/r[0].q1,2)+'<span class="unit"> ×</span>';
+ $('deltaEnd').innerHTML=fmt(Math.abs(last.dx),2)+'<span class="unit"> mm</span>';
+ $('deltaMax').innerHTML=fmt(absmax,2)+'<span class="unit"> mm</span>';
+ $('pMax').innerHTML=fmt(Math.max(...r.map(v=>Math.max(v.p1,v.p2))),0)+'<span class="unit"> bar</span>';
+ updateModeUI();$('endT').textContent=fmt(p.T,0);$('sourceP').textContent=fmt(p.ps,0);$('o1').textContent='Ø '+fmt(p.d1,1)+' mm';$('o2').textContent='Ø '+fmt(p.d2,1)+' mm';
+ const eq=p.motion==='paper'&&Math.abs(p.d1-p.d2)<.00001&&p.ps===320&&p.pb===20&&p.mass===120&&p.e===1&&p.cq===1&&p.damp===1&&p.T===30;
+ for(const b of document.querySelectorAll('#presets button'))b.classList.toggle('active',+b.dataset.d1===p.d1&&+b.dataset.d2===p.d2);
+ validation(r,eq);updateSchematic(0);for(let chart of Object.values(chartMap))chart.draw();
+}
+function nearestIndex(t){return Math.max(0,Math.min(data.length-1,Math.round(t*config.sampleRate)));}
+function updateSchematic(t){if(!data)return;timeNow=Math.max(0,Math.min(config.T,t));const idx=nearestIndex(timeNow),v=data[idx];
+ $('timeline').value=idx;$('timelineVal').textContent=fmt(v.t,2)+' s';$('liveTitle').textContent='t = '+fmt(v.t,2)+' s';
+ $('xVisual1').textContent=fmt(v.x1,1)+' mm';$('xVisual2').textContent=fmt(v.x2,1)+' mm';$('pVisual1').textContent=fmt(v.p1,1)+' bar';$('pVisual2').textContent=fmt(v.p2,1)+' bar';
+ $('qVisual1').textContent='Q₁ = '+fmt(v.q1,1)+' L/min';$('qVisual2').textContent='Q₂ = '+fmt(v.q2,1)+' L/min';$('currentDelta').textContent='Δx = '+fmt(v.dx,2)+' mm';
+ [v.x1,v.x2].forEach((x,j)=>{
+   let pos=config.motion==='paper' ? 722+Math.max(-58,Math.min(58,x*3)) : 722+Math.max(0,Math.min(600,x))/600*125;
+   let rodX=pos+12;
+   $('piston'+(j+1)).setAttribute('x',pos);
+   $('rod'+(j+1)).setAttribute('x',rodX);
+   $('rod'+(j+1)).setAttribute('width',220);
+   $('end'+(j+1)).setAttribute('x',rodX+220);
+ });
+ $('dash1').style.animationDuration=Math.max(.28,3/(1+Math.abs(v.q1)/50))+'s';$('dash2').style.animationDuration=Math.max(.28,3/(1+Math.abs(v.q2)/50))+'s';
+}
+function getRange(arr,key){let lo=Infinity,hi=-Infinity;for(const r of arr){let v=r[key];if(v<lo)lo=v;if(v>hi)hi=v}return [lo,hi];}
+class CanvasChart{
+ constructor(id, keys, labels, units, color, extra={}){this.id=id;this.keys=keys;this.labels=labels;this.units=units;this.colors=color;this.extra=extra;this.canvas=$('chart-'+id);this.tip=$('tip-'+id);this.hover=null;this.dims=null;
+   this.canvas.addEventListener('mousemove',e=>{if(!data)return;let rect=this.canvas.getBoundingClientRect(),px=e.clientX-rect.left,w=rect.width;if(!this.dims)return;let x=Math.max(0,Math.min(1,(px-this.dims.l)/(w-this.dims.l-this.dims.r)));this.hover=x*config.T;this.tooltipAt(e, this.hover);this.draw();});
+   this.canvas.addEventListener('mouseleave',()=>{this.hover=null;this.tip.style.display='none';this.draw()});
+   this.canvas.addEventListener('click',e=>{if(this.extra.sensitivity||!data)return;stop();let rect=this.canvas.getBoundingClientRect(),x=Math.max(0,Math.min(1,(e.clientX-rect.left-this.dims.l)/(rect.width-this.dims.l-this.dims.r)));updateSchematic(x*config.T)});
+ }
+ tooltipAt(e,t){if(this.extra.sensitivity){let dia=1+Math.max(0,Math.min(1,t/config.T))*9;let q=qFromD(dia);this.tip.innerHTML='<div class="tip-t">Diameter '+fmt(dia,2)+' mm</div><div class="r"><span>Q bij start</span><strong>'+fmt(q,1)+' L/min</strong></div>';}
+ else{const r=data[nearestIndex(t)];this.tip.innerHTML='<div class="tip-t">t = '+fmt(r.t,2)+' s</div>'+this.keys.map((k,i)=>'<div class="r"><span style="color:'+this.colors[i]+'">'+this.labels[i]+'</span><strong>'+fmt(r[k],2)+' '+this.units+'</strong></div>').join('');}
+ this.tip.style.display='block';const outer=this.canvas.parentElement.getBoundingClientRect(),x=e.clientX-outer.left,y=e.clientY-outer.top;this.tip.style.left=Math.max(4,Math.min(outer.width-150,x+12))+'px';this.tip.style.top=Math.max(5,Math.min(outer.height-100,y-15))+'px';}
+ draw(){if(!data)return;let canvas=this.canvas,w=canvas.clientWidth,h=canvas.clientHeight;if(w<30||h<20)return;let pixelRatio=Math.min(2,window.devicePixelRatio||1);if(canvas.width!==Math.round(w*pixelRatio)||canvas.height!==Math.round(h*pixelRatio)){canvas.width=Math.round(w*pixelRatio);canvas.height=Math.round(h*pixelRatio)}const ctx=canvas.getContext('2d');ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);ctx.clearRect(0,0,w,h);
+ let g={l:61,r:20,t:12,b:38};this.dims=g;const pw=w-g.l-g.r,ph=h-g.t-g.b, isSens=!!this.extra.sensitivity;
+ let lo=Infinity,hi=-Infinity;
+ if(isSens){lo=0;hi=qFromD(10)*1.14;}else{for(const key of this.keys){let range=getRange(data,key);lo=Math.min(lo,range[0]);hi=Math.max(hi,range[1]);}if(this.id==='pressure'){hi=Math.max(hi,config.ps);lo=Math.min(lo,0)}if(this.id==='flow'){lo=Math.min(0,lo);}if(this.id==='error'){lo=Math.min(lo,0);hi=Math.max(hi,0);}let pad=Math.max(1e-6,(hi-lo)*.09);lo-=pad;hi+=pad;}
+ if(hi<=lo)hi=lo+1;let sx=x=>g.l+x*pw,sy=y=>g.t+(hi-y)/(hi-lo)*ph;
+ ctx.lineWidth=1;ctx.font='11px Inter,Arial,sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';for(let i=0;i<=5;i++){let y=lo+(hi-lo)*i/5,yy=sy(y);ctx.strokeStyle='#243849';ctx.beginPath();ctx.moveTo(g.l,yy);ctx.lineTo(w-g.r,yy);ctx.stroke();ctx.fillStyle='#8fa6b6';ctx.fillText(fmt(y,Math.abs(hi-lo)>30?0:2),g.l-8,yy)}
+ ctx.textAlign='center';ctx.textBaseline='top';for(let i=0;i<=6;i++){let x=i/6,xx=sx(x);ctx.strokeStyle='#213748';ctx.beginPath();ctx.moveTo(xx,g.t);ctx.lineTo(xx,h-g.b);ctx.stroke();ctx.fillStyle='#93a7b8';ctx.fillText(isSens?fmt(1+9*x,1):fmt(config.T*x,0),xx,h-g.b+10)}
+ ctx.font='10px Inter,Arial,sans-serif';ctx.fillStyle='#7993a4';ctx.fillText(isSens?'Orifice-diameter [mm]':'Tijd [s]',g.l+pw/2,h-11);
+ if(!isSens){let l=()=>{};if(this.id==='pressure'){let yy=sy(config.ps);ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle='#a5b5c0';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(g.l,yy);ctx.lineTo(w-g.r,yy);ctx.stroke();ctx.restore();}
+   for(let k=0;k<this.keys.length;k++){ctx.strokeStyle=this.colors[k];ctx.lineWidth=1.25;ctx.lineJoin='round';ctx.beginPath();let every=Math.max(1,Math.floor(data.length/(pw*5)));for(let i=0;i<data.length;i+=every){let row=data[i],xx=sx(row.t/config.T),yy=sy(row[this.keys[k]]);if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}if((data.length-1)%every!==0)ctx.lineTo(sx(1),sy(data[data.length-1][this.keys[k]]));ctx.stroke();}
+ }else{ctx.beginPath();ctx.lineWidth=2.2;ctx.strokeStyle=this.colors[0];for(let j=0;j<=180;j++){let d=1+9*j/180,xx=sx(j/180),yy=sy(qFromD(d));if(j===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();
+   [config.d1,config.d2].forEach((d,j)=>{let xx=sx((d-1)/9),yy=sy(qFromD(d));ctx.beginPath();ctx.fillStyle=this.colors[j+1];ctx.strokeStyle='#0d1b29';ctx.lineWidth=2;ctx.arc(xx,yy,6.5,0,Math.PI*2);ctx.fill();ctx.stroke()});}
+ if(this.hover!==null){let xx=sx(this.hover/config.T);ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle='#9bc0d0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,g.t);ctx.lineTo(xx,g.t+ph);ctx.stroke();ctx.restore();if(!isSens){let row=data[nearestIndex(this.hover)];for(let i=0;i<this.keys.length;i++){let yy=sy(row[this.keys[i]]);ctx.fillStyle=this.colors[i];ctx.beginPath();ctx.arc(xx,yy,3,0,Math.PI*2);ctx.fill();}}}
+ }
+}
+function qFromD(d){const a=config;return a.cq*Math.PI/4*(d/1000)**2*Math.sqrt(2*a.ps*1e5/a.rho)*60000;}
+function makeCharts(){chartMap={position:new CanvasChart('position',['x1','x2'],['x₁','x₂'],'mm',['#52d7e8','#ffad69']),velocity:new CanvasChart('velocity',['v1','v2'],['v₁','v₂'],'mm/s',['#52d7e8','#ffad69']),pressure:new CanvasChart('pressure',['p1','p2'],['p₁','p₂'],'bar',['#52d7e8','#ffad69']),flow:new CanvasChart('flow',['q1','q2'],['Q₁','Q₂'],'L/min',['#52d7e8','#ffad69']),error:new CanvasChart('error',['dx'],['Δx'],'mm',['#86adff']),sensitivity:new CanvasChart('sensitivity',[],[],'L/min',['#86adff','#52d7e8','#ffad69'],{sensitivity:true})};}
+function validation(r,isBaseline){const paper=[['Startflow Q(0)','q1','q2',50.55,454.92,'L/min'],['Min. positie','x1','x2',-12.80,-16.67,'mm','min'],['Max. positie','x1','x2',5.74,4.40,'mm','max'],['Max. |snelheid|','v1','v2',2910.79,4566.26,'mm/s','abs'],['Min. druk','p1','p2',-90.95,-42.38,'bar','min'],['Max. druk','p1','p2',447.42,538.39,'bar','max'],['Eindpositie','x1','x2',-8.86,-10.17,'mm','end'],['Einddruk','p1','p2',383.64,430.92,'bar','end']];
+ function metric(key,mode){if(mode==='min')return Math.min(...r.map(v=>v[key]));if(mode==='max')return Math.max(...r.map(v=>v[key]));if(mode==='abs')return Math.max(...r.map(v=>Math.abs(v[key])));if(mode==='end')return r[r.length-1][key];return r[0][key]}
+ $('validationBody').innerHTML=paper.map(([label,k1,k2,v1,v2,unit,mode])=>'<tr><td>'+label+' <span class="tiny">['+unit+']</span></td><td>'+fmt(v1,2)+'</td><td><strong>'+fmt(metric(k1,mode),2)+'</strong></td><td>'+fmt(v2,2)+'</td><td><strong>'+fmt(metric(k2,mode),2)+'</strong></td></tr>').join('');
+ $('validationInfo').textContent=(config.motion!=='paper'?'Let op: je bekijkt een nieuwe uitschuif-/inschuifvariant, niet de originele paper-ODE. De oorspronkelijke papercijfers zijn daarom geen validatie voor deze modus.':isBaseline&&config.sampleRate===100?'Je bekijkt het oorspronkelijke 2/6 mm-scenario met 100 samples/s. Verschillen zijn mogelijk door RK4 tegenover DOP853.':'De paperkolommen blijven de originele 2/6 mm-referentie. Kies ‘Reset paper’ voor een directe vergelijking.')+'  Originele eigenfrequentie: '+fmt(config.fn,1)+' Hz.';
+}
+function downloadText(filename,text,type){const a=document.createElement('a'),blob=new Blob([text],{type}),url=URL.createObjectURL(blob);a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);}
+function exportCSV(){if(!data)return;const columns=['t','x1','x2','v1','v2','p1','p2','q1','q2','dx'];let text='# Gelijkloopcilinders model — t[s], x[mm], v[mm/s], p[bar], Q[L/min], dx[mm]\r\n'+columns.join(';')+'\r\n';text+=data.map(r=>columns.map(k=>r[k].toFixed(6).replace('.',',')).join(';')).join('\r\n');downloadText('gelijkloopcilinders_'+config.motion+'_'+config.d1+'_'+config.d2+'mm.csv',text,'text/csv;charset=utf-8');}
+function exportSummary(){if(!data)return;let p=config,last=data[data.length-1],body='HYDRAULISCHE GELIJKLOOPCILINDERS — SIMULATIESAMENVATTING\nGebaseerd op het ODE-model uit de paper van 6 november 2026\n\n';body+='Instellingen: '+JSON.stringify({d1_mm:p.d1,d2_mm:p.d2,p_sys_bar:p.ps,p_back_bar:p.pb,load_per_cylinder_t:p.mass,motion:p.motion,E_oil_GPa:p.e,Cq:p.cq,damping_factor:p.damp,duration_s:p.T,sampling_Hz:p.sampleRate},null,2)+'\n';body+='\nModus: '+MODES[p.motion].title+'\nEigenfrequentie paperreferentie: '+fmt(p.fn,3)+' Hz\n';body+='Startflowverhouding: '+fmt(data[0].q2/data[0].q1,4)+'\n';body+='Eindverschil in positie: '+fmt(last.dx,5)+' mm\n';body+='Max. absoluut positieverschil: '+fmt(Math.max(...data.map(x=>Math.abs(x.dx))),5)+' mm\n';body+='\nLet op: model zonder drukbegrenzing, cavitatie, lekken of eindstops; niet voor definitieve ontwerpvalidatie.\n';downloadText('gelijkloopcilinders_samenvatting.txt',body,'text/plain;charset=utf-8')}
+function exportPNG(id){const chart=chartMap[id];if(!chart)return;chart.draw();const a=document.createElement('a');a.href=chart.canvas.toDataURL('image/png');a.download='grafiek_'+id+'.png';a.click()}
+function animate(ts){if(!animation)return;if(!animationMark)animationMark=ts;let dt=Math.max(0,(ts-animationMark)/1000);animationMark=ts;timeNow+=dt*1.5;if(timeNow>config.T){timeNow=config.T;stop();}updateSchematic(timeNow);if(animation)frame=requestAnimationFrame(animate);}
+function togglePlay(){if(!data)return;if(animation){stop();return;}if(timeNow>=config.T)timeNow=0;animation=true;animationMark=0;$('play').textContent='❚❚';frame=requestAnimationFrame(animate)}
+function init(){makeCharts();updateModeUI();document.querySelectorAll('[data-motion]').forEach(b=>b.addEventListener('click',()=>chooseMotion(b.dataset.motion,b.dataset.motion!=='paper')));for(let k in INPUTS)$(k).addEventListener('input',()=>{renderControlLabels();queueSim()});$('resolution').addEventListener('change',queueSim);renderControlLabels();
+ $('simulate').addEventListener('click',()=>{clearTimeout(recomputeTimer);runSimulation()});$('reset').addEventListener('click',()=>{for(let k in INPUTS)$(k).value=INPUTS[k];$('resolution').value='100';motionMode='paper';renderControlLabels();clearTimeout(recomputeTimer);runSimulation()});
+ $('presets').addEventListener('click',e=>{const b=e.target.closest('button[data-d1]');if(!b)return;$('d1').value=b.dataset.d1;$('d2').value=b.dataset.d2;renderControlLabels();clearTimeout(recomputeTimer);runSimulation()});
+ $('play').addEventListener('click',togglePlay);$('timeline').addEventListener('input',()=>{stop();updateSchematic(Number($('timeline').value)/values().sampleRate)});
+ $('exportCsv').addEventListener('click',exportCSV);$('exportSummary').addEventListener('click',exportSummary);document.querySelectorAll('[data-export]').forEach(b=>b.addEventListener('click',()=>exportPNG(b.dataset.export)));
+ const observer=new ResizeObserver(()=>{if(data)for(let chart of Object.values(chartMap))chart.draw()});document.querySelectorAll('.chart-body').forEach(node=>observer.observe(node));
+ runSimulation();}
+window.__hydraulicLab={simulate,modelParameters,values,runSimulation,chooseMotion,getMotion:()=>motionMode};
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body></html>
